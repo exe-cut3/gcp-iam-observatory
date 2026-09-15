@@ -13,21 +13,6 @@
     <h1>GCP IAM Observatory</h1>
   </div>
   <p class="tagline">New IAM permissions as an early signal for unreleased Google Cloud functionality.</p>
-  <details class="settings">
-    <summary>Try-it settings</summary>
-    <div class="settings-body">
-      <label>Project ID
-        <input id="setting-project" type="text" placeholder="my-sandbox-project" autocomplete="off" spellcheck="false">
-      </label>
-      <label>Location
-        <input id="setting-location" type="text" placeholder="us-central1" autocomplete="off" spellcheck="false">
-      </label>
-      <label>Service account to impersonate
-        <input id="setting-sa" type="text" placeholder="prober@my-sandbox-project.iam.gserviceaccount.com" autocomplete="off" spellcheck="false">
-      </label>
-      <p class="hint">Only used to fill in the generated curl commands, and kept in this browser. No tokens are stored anywhere.</p>
-    </div>
-  </details>
   <nav class="tabs" role="tablist" aria-label="Views">
     <button role="tab" id="tab-feed" aria-controls="panel-feed" aria-selected="true" class="tab">Feed</button>
     <button role="tab" id="tab-lookup" aria-controls="panel-lookup" aria-selected="false" class="tab">Lookup</button>

@@ -9,7 +9,6 @@ const state = {
   apis: {},
   apiDays: null,
   details: new Map(),
-  settings: { project: '', location: '', sa: '' },
   tryIts: [],
   requestFormat: 'curl',
   tiers: new Set([0, 1]),
@@ -64,7 +63,7 @@ async function boot() {
     initTabs();
     initFeedControls();
     initLookup();
-    initSettings();
+    initRequestFormat();
     renderFeed();
     renderCadence();
     renderFooter(events.generatedAt);
@@ -531,16 +530,7 @@ function bar(name, value, max, valueLabel, note, isPeak) {
 
 /* ---------------- permission metadata & API explorer ---------------- */
 
-const SETTINGS_KEY = 'observatory.tryit';
 const FORMAT_KEY = 'observatory.requestFormat';
-
-// Values are pasted into a shell command, so anything outside the real format is
-// ignored rather than interpolated.
-const SETTING_RULES = {
-  project: /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/,
-  location: /^[a-z0-9-]{2,40}$/,
-  sa: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
-};
 
 const API_STATUS = {
   listed: { label: 'API public', cls: 'ok', title: 'Discovery document is public and listed in Google’s API directory' },
@@ -549,44 +539,13 @@ const API_STATUS = {
   not_found: { label: 'no API host', cls: 'none', title: 'Nothing answers at this service’s googleapis.com host for the versions tried' },
 };
 
-function initSettings() {
+function initRequestFormat() {
   try {
-    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
-    for (const key of Object.keys(state.settings)) {
-      if (typeof saved[key] === 'string') state.settings[key] = saved[key];
-    }
     const format = localStorage.getItem(FORMAT_KEY);
     if (format === 'curl' || format === 'http') state.requestFormat = format;
   } catch {
-    // Storage unavailable (private window, blocked site data): settings just don't persist.
+    // Storage unavailable (private window, blocked site data): the choice just doesn't persist.
   }
-
-  for (const key of Object.keys(state.settings)) {
-    const input = document.getElementById(`setting-${key}`);
-    if (!input) continue;
-    input.value = state.settings[key];
-    markValidity(input, key);
-    input.addEventListener('input', () => {
-      state.settings[key] = input.value.trim();
-      markValidity(input, key);
-      try {
-        localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
-      } catch {
-        // Same as above: keep working without persistence.
-      }
-      refreshRequests();
-    });
-  }
-}
-
-function markValidity(input, key) {
-  const value = input.value.trim();
-  input.classList.toggle('invalid', Boolean(value) && !SETTING_RULES[key].test(value));
-}
-
-function settingValue(key) {
-  const value = state.settings[key];
-  return value && SETTING_RULES[key].test(value) ? value : '';
 }
 
 function apiBadge(service) {
@@ -861,18 +820,14 @@ function placeholderName(name) {
     .toUpperCase();
 }
 
-function pathValue(name, project, location) {
-  if (/^projects?(Id)?$/.test(name)) return project || 'PROJECT_ID';
-  if (/^locations?(Id)?$/.test(name)) return location || 'LOCATION';
+function pathValue(name) {
+  if (/^projects?(Id)?$/.test(name)) return 'PROJECT_ID';
+  if (/^locations?(Id)?$/.test(name)) return 'LOCATION';
   return placeholderName(name);
 }
 
 function buildRequest(method, discovery, schemas) {
-  const project = settingValue('project');
-  const location = settingValue('location');
-  const sa = settingValue('sa');
-
-  const path = method.path.replace(/\{\+?([^}]+)\}/g, (_, name) => pathValue(name, project, location));
+  const path = method.path.replace(/\{\+?([^}]+)\}/g, (_, name) => pathValue(name));
   let url = `${discovery.rootUrl || ''}${discovery.servicePath || ''}${path}`;
   const requiredQuery = method.parameters.filter((p) => p.location === 'query' && p.required);
   if (requiredQuery.length) {
@@ -880,20 +835,12 @@ function buildRequest(method, discovery, schemas) {
   }
 
   const headers = [];
-  // A user token from gcloud is billed to gcloud's own client project unless told
-  // otherwise, which many APIs reject; an impersonated token already carries one.
-  if (project && !sa) headers.push(['x-goog-user-project', project]);
-
   let body = null;
   if (method.request) {
     body = JSON.stringify(bodySkeleton(method.request, schemas, 0), null, 2);
     headers.push(['Content-Type', 'application/json']);
   }
-
-  const tokenCommand = sa
-    ? `gcloud auth print-access-token --impersonate-service-account=${sa}`
-    : 'gcloud auth print-access-token';
-  return { httpMethod: method.httpMethod, url, headers, body, tokenCommand };
+  return { httpMethod: method.httpMethod, url, headers, body, tokenCommand: 'gcloud auth print-access-token' };
 }
 
 function formatCurl(req) {
@@ -923,8 +870,8 @@ function renderTryIt(entry) {
   const raw = state.requestFormat === 'http';
   entry.code.textContent = raw ? formatRawHttp(req) : formatCurl(req);
   entry.hint.textContent = raw
-    ? `Replace ACCESS_TOKEN with the output of: ${req.tokenCommand}`
-    : 'Fill project, location and service account under “Try-it settings” to replace the placeholders. ' +
+    ? `Replace ACCESS_TOKEN with the output of \`${req.tokenCommand}\`, and the UPPER_CASE placeholders with your values.`
+    : 'Replace the UPPER_CASE placeholders with your values. ' +
       'The command asks gcloud for a short-lived token; nothing on this page holds credentials.';
   for (const [format, button] of Object.entries(entry.buttons)) {
     button.setAttribute('aria-pressed', String(format === state.requestFormat));

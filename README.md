@@ -42,8 +42,7 @@ Opening a card adds two layers of detail, neither of which needs credentials:
 - **API explorer** — the service's Discovery document (Google's equivalent of an
   OpenAPI spec) shown as endpoints, parameters and schemas, each method joined to the
   permission it needs, with a ready-to-copy `curl` that fetches its own token from
-  `gcloud`. Fill in project, location and service account under *Try-it settings* and
-  the placeholders are filled in for you.
+  `gcloud`, or the same request as raw HTTP for a proxy such as Caido or Burp.
 
 ## Running it
 

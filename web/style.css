@@ -355,24 +355,6 @@ footer {
   ul.perms { grid-template-columns: 1fr; }
 }
 
-/* ---------- try-it settings ---------- */
-
-.settings { margin: -6px 0 12px; font-size: 13px; }
-.settings > summary { cursor: pointer; color: var(--text-dim); width: max-content; }
-.settings > summary:hover { color: var(--text); }
-.settings-body { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; margin-top: 10px; }
-.settings-body label {
-  display: flex; flex-direction: column; gap: 4px; flex: 1 1 200px;
-  color: var(--text-faint); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
-}
-.settings-body input {
-  background: var(--bg); border: 1px solid var(--border-strong); border-radius: var(--radius);
-  color: var(--text); font: 13px var(--mono); padding: 6px 9px; min-width: 0;
-  text-transform: none; letter-spacing: 0;
-}
-.settings-body input.invalid { border-color: var(--removed); }
-.settings-body .hint { flex-basis: 100%; margin: 0; }
-
 /* ---------- permission metadata ---------- */
 
 .stage-badge {
