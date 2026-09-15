@@ -11,7 +11,7 @@ This repo is the hub. Locally it sits next to three sibling repos in `..`:
 | Repo | Role | Status |
 |---|---|---|
 | `gcp-permissions-checker` | **Collector**: GitHub Actions job (daily 23:00 UTC) writing `permissions.txt` and `permissions_metadata.jsonl`; also a recon CLI, `gcp_perm_checker.py --service-account key.json` or `--token T --project P`, that tests what a credential can do. The **git history of `permissions.txt` (since 2024-06-06) is the only durable data record**; everything else is derived and rebuildable. | active |
-| `gcp-iam-observatory` (this repo) | **The system being built**: indexer, dashboard, MCP server, daily workflow, API spec history. Replaces both legacy dashboards. | built locally, not yet pushed (see Current state) |
+| `gcp-iam-observatory` (this repo) | **The system being built**: indexer, dashboard, MCP server, daily workflow, API spec history. Replaces both legacy dashboards. | live since 2026-09-15 |
 | `gcp-permissions-watchdog` | Legacy dashboard over the collector. Its workflow is `disabled_inactivity` since 2026-07-18 because it never commits. | to retire |
 | `gcp-iam-changelog` | Legacy dashboard over the third-party `iann0036/iam-dataset`; still runs daily. | to retire |
 
@@ -90,9 +90,11 @@ MCP server specifics:
 - About 49% of method→permission links come from iam-dataset's map, 26% are inferred from names (and labelled so), 25% are unknown. About 29% of catalog permissions have no role data upstream.
 - A missing `stage` in the IAM response is recorded as ALPHA (the proto3 zero value). This is unverified until the collector's first real run with metadata. `apiDisabled` is deliberately not stored because it describes the collector's own project.
 
-## Current state (2026-09-15)
+## Current state (2026-09-16)
 
-- **Pushing is blocked**: exe-cut3's gh token lacks the `workflow` scope, and every pending commit touches `.github/workflows/`. The user must run `gh auth refresh --hostname github.com --scopes workflow` and approve it as exe-cut3.
-- Once unblocked: push `gcp-permissions-checker` (3 commits: shrink guard, permission metadata, heartbeat) and this repo (its GitHub repo exists, public and empty). Then trigger `daily-catalog` with workflow_dispatch, confirm the `index-latest` release, and run `docker compose up -d --build` so the local containers switch from build mode to sync mode (they still run the old entrypoint). Finally verify the MCP server.
+- **The pipeline is live.** Both repos are pushed. The first `daily-catalog` run (triggered by hand on 2026-09-15) passed, recorded the specs baseline in `specs/` and published `index-latest`. The local containers run in sync mode and serve that index.
+- The workflow commits `specs/` every day, so `git pull` before committing here.
+- Still to confirm: the collector's first scheduled run with the new code (23:00 UTC after 2026-09-15) should create `permissions_metadata.jsonl`. If its stages come out almost entirely ALPHA, the ALPHA default for a missing `stage` is wrong. The following 01:00 UTC `daily-catalog` run is the first real day-over-day spec comparison; `specs/changes.jsonl` only appears once something changes.
+- No Telegram secrets are set on this repo yet, so a failed `daily-catalog` run only triggers GitHub's email.
 - `gcp-iam-changelog` has 2 unpushed fixes (the `roles/` prefix bug, orphaned page files); the user has not approved pushing them.
 - Open, undecided: collecting org-level permissions (querying an organization), fixing how the dashboard labels the five org services, retiring the legacy repos, Telegram secrets for this repo, an API key to fetch restricted specs (the user chose anonymous for now), stage-promotion events, a privileged-verbs filter.
