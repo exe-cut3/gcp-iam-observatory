@@ -9,6 +9,7 @@ optional: without network the index still builds, just without role context.
 from __future__ import annotations
 
 import json
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -17,7 +18,12 @@ RAW_BASE = "https://raw.githubusercontent.com/iann0036/iam-dataset/main/gcp"
 SOURCES = {
     "predefined_roles.json": f"{RAW_BASE}/predefined_roles.json",
     "permissions.json": f"{RAW_BASE}/permissions.json",
+    "map.json": f"{RAW_BASE}/map.json",
 }
+
+# Upstream republishes daily; the cache lives in a long-lived Docker volume, so
+# without an expiry it would serve the first download forever.
+CACHE_TTL_SECONDS = 24 * 3600
 
 # Roles broad enough that granting a new permission through them widens blast
 # radius for every principal already holding the role.
@@ -29,13 +35,14 @@ def fetch(cache_dir: Path, refresh: bool = False) -> dict[str, Path]:
     paths = {}
     for name, url in SOURCES.items():
         target = cache_dir / name
-        if refresh or not target.exists():
+        expired = not target.exists() or time.time() - target.stat().st_mtime > CACHE_TTL_SECONDS
+        if refresh or expired:
             try:
                 with urllib.request.urlopen(url, timeout=120) as response:
                     target.write_bytes(response.read())
             except (urllib.error.URLError, TimeoutError) as exc:
-                print(f"  ! could not fetch {name}: {exc}")
-                continue
+                fallback = " (using cached copy)" if target.exists() else ""
+                print(f"  ! could not fetch {name}: {exc}{fallback}")
         if target.exists():
             paths[name] = target
     return paths
@@ -69,7 +76,11 @@ def load(cache_dir: Path, refresh: bool = False) -> dict:
                 names = [r.get("id", "") for r in roles if isinstance(r, dict)]
                 granting_roles[permission] = [n for n in names if n]
 
-    return {"rolesByService": roles_by_service, "grantingRoles": granting_roles}
+    return {
+        "rolesByService": roles_by_service,
+        "grantingRoles": granting_roles,
+        "mapPath": paths.get("map.json"),
+    }
 
 
 def apply(events, context: dict) -> None:

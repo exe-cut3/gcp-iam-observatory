@@ -34,6 +34,17 @@ Role-mapping churn is never a headline; it lives inside a card as evidence.
 - **Lookup** — when did a given permission first appear, and what landed alongside it
 - **Cadence** — Google's release rhythm by weekday and by month
 
+Opening a card adds two layers of detail, neither of which needs credentials:
+
+- **Permission metadata** — title, launch stage and custom-role support for each
+  permission, read from `permissions_metadata.jsonl` in the collector once it records
+  one. Non-GA stages are flagged on the card.
+- **API explorer** — the service's Discovery document (Google's equivalent of an
+  OpenAPI spec) shown as endpoints, parameters and schemas, each method joined to the
+  permission it needs, with a ready-to-copy `curl` that fetches its own token from
+  `gcloud`. Fill in project, location and service account under *Try-it settings* and
+  the placeholders are filled in for you.
+
 ## Running it
 
 Everything runs in Docker. The only input is a local clone of the collector repo,
@@ -61,6 +72,8 @@ still builds; cards just lose their role context.
 | `lookup.json` | Permission → first seen / removed, loaded on demand |
 | `services.json` | Roles per service, referenced by events rather than repeated |
 | `cadence.json` | Weekday and monthly statistics |
+| `apis.json` | Discovery status per explored service |
+| `detail/<service>.json` | Metadata, methods and schemas for one service, loaded on demand |
 | `meta.json` | Coverage, collection gaps, excluded snapshots |
 
 ## Honesty about the data
@@ -82,6 +95,15 @@ rather than papering over it:
 - **Corrupt snapshots are excluded.** A snapshot that loses more than half the catalog
   is treated as a collection failure. This has happened once for real, when the list
   was briefly replaced by a two-line test fixture.
+
+- **API status is what an anonymous caller sees.** A 403 means the service's host
+  exists but will not hand its Discovery document to a caller without an API key; on
+  its own that does not prove the API is private. "No API host" means nothing answers at
+  `<service>.googleapis.com`, which also happens when permissions guard an API
+  published under another name.
+- **Method-to-permission links are labelled by source.** Most come from iam-dataset's
+  method map. That map lags new services, so for those the link is inferred by matching
+  the method name against the catalog, and marked as inferred.
 
 Every gap permanently costs resolution in the historical record, which is the real
 reason the collector must not stop.

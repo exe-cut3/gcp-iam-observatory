@@ -14,6 +14,7 @@ services:
       # Mounted so code edits need only `docker compose restart`, not a rebuild.
       - ./web:/app/web:ro
       - ./indexer:/app/indexer:ro
+      - ./tests:/app/tests:ro
     environment:
       # Add --no-enrich here to build without fetching role data from the network.
       INDEXER_ARGS: ""

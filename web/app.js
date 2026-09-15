@@ -6,6 +6,11 @@ const state = {
   cadence: null,
   lookup: null,          // loaded on demand; it is the largest file
   services: {},
+  apis: {},
+  apiDays: null,
+  details: new Map(),
+  settings: { project: '', location: '', sa: '' },
+  curls: [],
   tiers: new Set([0, 1]),
   days: 30,
   filter: '',
@@ -40,21 +45,25 @@ async function loadJSON(name) {
 
 async function boot() {
   try {
-    const [events, meta, cadence, services] = await Promise.all([
+    const [events, meta, cadence, services, apis] = await Promise.all([
       loadJSON('events.json'),
       loadJSON('meta.json'),
       loadJSON('cadence.json'),
       loadJSON('services.json').catch(() => ({ rolesByService: {} })),
+      loadJSON('apis.json').catch(() => ({ services: {}, exploredDays: null })),
     ]);
     state.events = events.events;
     state.meta = meta;
     state.cadence = cadence;
     state.services = services.rolesByService || {};
+    state.apis = apis.services || {};
+    state.apiDays = apis.exploredDays;
 
     $('#loading').hidden = true;
     initTabs();
     initFeedControls();
     initLookup();
+    initSettings();
     renderFeed();
     renderCadence();
     renderFooter(events.generatedAt);
@@ -230,6 +239,8 @@ function renderCard(event) {
   summary.appendChild(badge);
 
   summary.appendChild(el('span', 'title', event.title));
+  const api = apiBadge(event.service);
+  if (api) summary.appendChild(api);
   summary.appendChild(el('span', 'count',
     `${event.count} permission${event.count === 1 ? '' : 's'}`));
   card.appendChild(summary);
@@ -240,6 +251,7 @@ function renderCard(event) {
   const list = el('ul', 'perms');
   for (const permission of event.permissions) {
     const item = el('li');
+    item.dataset.perm = permission;
     const idx = permission.lastIndexOf('.');
     item.appendChild(document.createTextNode(permission.slice(0, idx + 1)));
     item.appendChild(el('span', 'verb', permission.slice(idx + 1)));
@@ -272,7 +284,17 @@ function renderCard(event) {
     body.appendChild(roles);
   }
 
+  if (event.change === 'added') body.appendChild(el('div', 'api-section'));
   card.appendChild(body);
+
+  let enhanced = false;
+  const enhance = () => {
+    if (enhanced || !card.open) return;
+    enhanced = true;
+    loadDetail(event.service).then((detail) => enhanceCard(card, event, detail));
+  };
+  card.addEventListener('toggle', enhance);
+  if (card.open) queueMicrotask(enhance);
   return card;
 }
 
@@ -348,13 +370,16 @@ function runLookup() {
     const wrap = el('div', 'table-wrap');
     const table = el('table', 'results');
     const head = el('tr');
-    ['Permission', 'First seen', 'Status'].forEach((h) => head.appendChild(el('th', null, h)));
+    const hasStage = Boolean(state.meta.metadata && state.meta.metadata.available);
+    ['Permission', 'First seen', 'Status'].concat(hasStage ? ['Stage'] : [])
+      .forEach((h) => head.appendChild(el('th', null, h)));
     table.appendChild(head);
     for (const [name, rec] of matches) {
       const row = el('tr');
       row.appendChild(el('td', null, name));
       row.appendChild(el('td', 'date', rec[1] ? 'predates record' : rec[0]));
       row.appendChild(el('td', rec[2] ? 'date gone' : 'date', rec[2] ? `removed ${rec[2]}` : 'active'));
+      if (hasStage) row.appendChild(el('td', 'date', rec[3] || ''));
       table.appendChild(row);
     }
     wrap.appendChild(table);
@@ -395,6 +420,12 @@ function renderAnswer(name, rec) {
     card.appendChild(el('div', 'detail',
       `${total} permission${total === 1 ? '' : 's'} landed that day across ${sameDay.length} event${sameDay.length === 1 ? '' : 's'}.`));
   }
+
+  const extra = el('div', 'answer-extra');
+  card.appendChild(extra);
+  loadDetail(name.split('.')[0]).then((detail) => {
+    if (extra.isConnected) renderAnswerDetail(extra, name, detail);
+  });
   return card;
 }
 
@@ -454,6 +485,13 @@ function renderCadence() {
     ['Dense enough to date precisely since', coverage.reliableFrom || '—'],
     ['Collection gaps longer than ' + coverage.reliableGapDays + ' days', String((coverage.gaps || []).length)],
     ['Corrupt snapshots excluded', String((coverage.anomalies || []).length)],
+    ['Permission metadata', state.meta.metadata && state.meta.metadata.available
+      ? `${state.meta.metadata.permissions.toLocaleString()} permissions`
+      : 'not collected yet'],
+    ['API docs explored', state.meta.discovery && state.meta.discovery.days != null
+      ? `${state.meta.discovery.explored} services · ` + Object.entries(state.meta.discovery.byStatus)
+        .map(([status, n]) => `${status.replace('_', ' ')} ${n}`).join(', ')
+      : 'off'],
   ];
   for (const [label, value] of lines) {
     const row = el('div', 'cov-line');
@@ -488,6 +526,427 @@ function bar(name, value, max, valueLabel, note, isPeak) {
   if (note) label.appendChild(document.createTextNode(` · ${note}`));
   row.appendChild(label);
   return row;
+}
+
+/* ---------------- permission metadata & API explorer ---------------- */
+
+const SETTINGS_KEY = 'observatory.tryit';
+
+// Values are pasted into a shell command, so anything outside the real format is
+// ignored rather than interpolated.
+const SETTING_RULES = {
+  project: /^[a-z][a-z0-9-]{4,28}[a-z0-9]$/,
+  location: /^[a-z0-9-]{2,40}$/,
+  sa: /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+};
+
+const API_STATUS = {
+  listed: { label: 'API public', cls: 'ok', title: 'Discovery document is public and listed in Google’s API directory' },
+  unlisted: { label: 'API unlisted', cls: 'unlisted', title: 'Discovery document is served publicly but the API is not in Google’s directory' },
+  restricted: { label: 'API needs key', cls: 'restricted', title: 'The API host exists but will not serve its Discovery document to an anonymous caller' },
+  not_found: { label: 'no API host', cls: 'none', title: 'Nothing answers at this service’s googleapis.com host for the versions tried' },
+};
+
+function initSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+    for (const key of Object.keys(state.settings)) {
+      if (typeof saved[key] === 'string') state.settings[key] = saved[key];
+    }
+  } catch {
+    // Storage unavailable (private window, blocked site data): settings just don't persist.
+  }
+
+  for (const key of Object.keys(state.settings)) {
+    const input = document.getElementById(`setting-${key}`);
+    if (!input) continue;
+    input.value = state.settings[key];
+    markValidity(input, key);
+    input.addEventListener('input', () => {
+      state.settings[key] = input.value.trim();
+      markValidity(input, key);
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(state.settings));
+      } catch {
+        // Same as above: keep working without persistence.
+      }
+      refreshCurls();
+    });
+  }
+}
+
+function markValidity(input, key) {
+  const value = input.value.trim();
+  input.classList.toggle('invalid', Boolean(value) && !SETTING_RULES[key].test(value));
+}
+
+function settingValue(key) {
+  const value = state.settings[key];
+  return value && SETTING_RULES[key].test(value) ? value : '';
+}
+
+function apiBadge(service) {
+  const info = state.apis[service];
+  const spec = info && API_STATUS[info.status];
+  if (!spec) return null;
+  const label = info.status === 'restricted' && info.reasonKind !== 'identity' ? 'API restricted' : spec.label;
+  const badge = el('span', `api-badge ${spec.cls}`, label);
+  badge.title = spec.title;
+  return badge;
+}
+
+function loadDetail(service) {
+  if (!/^[a-z][a-z0-9-]*$/.test(service)) return Promise.resolve(null);
+  if (!state.details.has(service)) {
+    state.details.set(service,
+      fetch(`detail/${service}.json`, { cache: 'no-cache' })
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null));
+  }
+  return state.details.get(service);
+}
+
+function enhanceCard(card, event, detail) {
+  const permissions = (detail && detail.permissions) || {};
+  card.querySelectorAll('ul.perms li[data-perm]').forEach((entry) => {
+    const meta = permissions[entry.dataset.perm];
+    if (!meta) return;
+    if (meta.stage && meta.stage !== 'GA') {
+      entry.appendChild(el('span', `stage-badge ${meta.stage.toLowerCase()}`, meta.stage));
+    }
+    if (meta.title) entry.appendChild(el('div', 'perm-title', meta.title));
+  });
+
+  const section = card.querySelector('.api-section');
+  if (section) renderApiSection(section, event, detail);
+}
+
+function renderApiSection(section, event, detail) {
+  section.textContent = '';
+  section.appendChild(el('h4', null, 'API explorer'));
+
+  const info = detail && detail.discovery;
+  if (!info) {
+    section.appendChild(el('p', 'api-note', state.apiDays
+      ? `Not explored. API documents are fetched for services with additions in the last ${state.apiDays} days.`
+      : 'API exploration is turned off for this build.'));
+    return;
+  }
+
+  section.appendChild(renderDiscoveryStatus(info, event.service));
+  const methods = detail.methods || [];
+  if (!methods.length) return;
+
+  let shown = methods;
+  let note = `${methods.length} method${methods.length === 1 ? '' : 's'}.`;
+  if (event.tier !== 0) {
+    const matching = methods.filter((m) => m.resource === event.resource);
+    if (matching.length) {
+      shown = matching;
+      note = `${matching.length} of ${methods.length} methods act on ${event.resource}.`;
+    } else {
+      note = `No method could be matched to ${event.resource}; showing all ${methods.length} for ${event.service}.`;
+    }
+  }
+  section.appendChild(el('p', 'api-note', note));
+
+  const list = el('div', 'methods');
+  renderMethodBatch(list, shown, detail, 0);
+  section.appendChild(list);
+}
+
+const METHOD_BATCH = 40;
+
+function renderMethodBatch(list, methods, detail, start) {
+  const end = Math.min(start + METHOD_BATCH, methods.length);
+  for (let i = start; i < end; i++) list.appendChild(renderMethod(methods[i], detail));
+  if (end < methods.length) {
+    const more = el('button', 'more', `Show ${methods.length - end} more`);
+    more.addEventListener('click', () => {
+      more.remove();
+      renderMethodBatch(list, methods, detail, end);
+    });
+    list.appendChild(more);
+  }
+}
+
+function renderDiscoveryStatus(info, service) {
+  const box = el('div', `api-status ${info.status}`);
+  const line = el('div', 'api-status-line');
+  const badge = apiBadge(service);
+  if (badge) line.appendChild(badge);
+  if (info.title) line.appendChild(el('span', 'api-title', info.title));
+  if (info.version) line.appendChild(el('span', 'api-version', info.version));
+  if (info.documentationLink && /^https:\/\//.test(info.documentationLink)) {
+    const link = el('a', 'api-doc', 'docs ↗');
+    link.href = info.documentationLink;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    line.appendChild(link);
+  }
+  box.appendChild(line);
+
+  const explanation = {
+    listed: 'Published in Google’s public API directory.',
+    unlisted: 'The Discovery document is served publicly, but the API is not listed in Google’s directory.',
+    restricted: `${service}.googleapis.com answered, but refused an anonymous request for its Discovery document: “${info.reason || 'permission denied'}” This explorer only makes anonymous requests, so the endpoints stay hidden here.`,
+    not_found: `Nothing answered at ${service}.googleapis.com. The permissions may guard an API published under a different name.`,
+    error: 'Google could not be reached for this service during the last build; it is retried on the next one.',
+  }[info.status];
+  if (explanation) box.appendChild(el('p', 'api-note', explanation));
+
+  const tried = (info.tried || []).map((t) => `${t.version}→${t.code == null ? 'no response' : t.code}`).join('  ');
+  if (tried) box.appendChild(el('p', 'api-tried', `tried: ${tried}`));
+  return box;
+}
+
+function renderMethod(method, detail, focus) {
+  const row = el('details', 'method');
+  const summary = el('summary');
+  summary.appendChild(el('span', `http ${method.httpMethod.toLowerCase()}`, method.httpMethod));
+  summary.appendChild(el('code', 'method-path', method.path));
+  if (method.permissions.length) {
+    const shown = focus && method.permissions.includes(focus) ? focus : method.permissions[0];
+    const extraCount = method.permissions.length - 1;
+    summary.appendChild(el('span', 'method-perm', shown + (extraCount ? ` +${extraCount}` : '')));
+  }
+  row.appendChild(summary);
+  row.addEventListener('toggle', () => {
+    if (row.open && row.childElementCount === 1) row.appendChild(renderMethodBody(method, detail));
+  });
+  return row;
+}
+
+function renderMethodBody(method, detail) {
+  const body = el('div', 'method-body');
+  body.appendChild(el('div', 'method-id', method.id));
+  if (method.description) body.appendChild(el('p', 'method-desc', method.description));
+
+  body.appendChild(el('h5', null, 'Required permission'));
+  if (method.permissions.length) {
+    const perms = el('div', 'roles');
+    method.permissions.forEach((p) => perms.appendChild(el('span', 'role', p)));
+    perms.appendChild(el('span', 'perm-source',
+      method.permissionSource === 'mapped' ? 'from iam-dataset method map' : 'inferred from the method name'));
+    body.appendChild(perms);
+  } else {
+    body.appendChild(el('p', 'api-note',
+      'Unknown — not in the method map, and no permission in the catalog matches the method name.'));
+  }
+
+  if (method.parameters.length) {
+    body.appendChild(el('h5', null, 'Parameters'));
+    const table = el('table', 'params');
+    const head = el('tr');
+    ['Name', 'In', 'Type', 'Description'].forEach((h) => head.appendChild(el('th', null, h)));
+    table.appendChild(head);
+    for (const param of method.parameters) {
+      const tr = el('tr');
+      tr.appendChild(el('td', 'mono', param.name + (param.required ? ' *' : '')));
+      tr.appendChild(el('td', null, param.location));
+      tr.appendChild(el('td', 'mono', param.type + (param.enum ? ` (${param.enum.join(' | ')})` : '')));
+      tr.appendChild(el('td', 'desc', param.description || ''));
+      table.appendChild(tr);
+    }
+    const wrap = el('div', 'table-wrap');
+    wrap.appendChild(table);
+    body.appendChild(wrap);
+  }
+
+  const schemas = detail.schemas || {};
+  if (method.request) {
+    body.appendChild(el('h5', null, 'Request body'));
+    body.appendChild(renderSchema(method.request, schemas, 0));
+  }
+  if (method.response) {
+    body.appendChild(el('h5', null, 'Response'));
+    body.appendChild(renderSchema(method.response, schemas, 0));
+  }
+
+  body.appendChild(el('h5', null, 'Try it'));
+  const wrap = el('div', 'curl-wrap');
+  const pre = el('pre', 'curl');
+  const code = el('code');
+  pre.appendChild(code);
+  const copy = el('button', 'copy', 'Copy');
+  copy.addEventListener('click', () => copyText(code.textContent, copy));
+  wrap.appendChild(pre);
+  wrap.appendChild(copy);
+  body.appendChild(wrap);
+
+  const entry = { code, method, discovery: detail.discovery, schemas };
+  state.curls.push(entry);
+  code.textContent = buildCurl(entry.method, entry.discovery, entry.schemas);
+  body.appendChild(el('p', 'hint',
+    'Fill project, location and service account under “Try-it settings” to replace the placeholders. ' +
+    'The command asks gcloud for a short-lived token; nothing on this page holds credentials.'));
+  return body;
+}
+
+function renderSchema(name, schemas, depth) {
+  const box = el('div', 'schema');
+  const schema = schemas[name];
+  box.appendChild(el('div', 'schema-name', name));
+  if (!schema) {
+    box.appendChild(el('p', 'api-note', 'Definition not included in this build.'));
+    return box;
+  }
+  if (schema.description && depth === 0) box.appendChild(el('p', 'schema-desc', schema.description));
+
+  const props = Object.entries(schema.properties || {});
+  const list = el('ul', 'schema-props');
+  if (!props.length) list.appendChild(el('li', 'api-note', schema.type || 'object'));
+  for (const [prop, spec] of props) list.appendChild(renderProperty(prop, spec, schemas, depth));
+  box.appendChild(list);
+  return box;
+}
+
+function renderProperty(prop, spec, schemas, depth) {
+  const entry = el('li');
+  const ref = spec.$ref || (spec.items && spec.items.$ref);
+  let typeLabel;
+  if (spec.$ref) typeLabel = spec.$ref;
+  else if (spec.type === 'array') typeLabel = `${(spec.items && (spec.items.$ref || spec.items.type)) || 'any'}[]`;
+  else typeLabel = (spec.type || 'any') + (spec.format ? ` (${spec.format})` : '');
+
+  const line = el('div', 'prop-line');
+  line.appendChild(el('span', 'prop-name', prop));
+  line.appendChild(el('span', 'prop-type', typeLabel));
+  if (spec.readOnly) line.appendChild(el('span', 'prop-flag', 'output only'));
+  if (spec.enum) line.appendChild(el('span', 'prop-enum', spec.enum.join(' | ')));
+  const desc = spec.description ? el('div', 'prop-desc', spec.description) : null;
+
+  if (ref && schemas[ref] && depth < 6) {
+    const nested = el('details', 'prop-nested');
+    const summary = el('summary');
+    summary.appendChild(line);
+    nested.appendChild(summary);
+    if (desc) nested.appendChild(desc);
+    nested.addEventListener('toggle', () => {
+      if (nested.open && !nested.querySelector(':scope > .schema')) {
+        nested.appendChild(renderSchema(ref, schemas, depth + 1));
+      }
+    });
+    entry.appendChild(nested);
+  } else {
+    entry.appendChild(line);
+    if (desc) entry.appendChild(desc);
+  }
+  return entry;
+}
+
+function placeholderName(name) {
+  return name
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2')
+    .replace(/[^A-Za-z0-9_]/g, '_')
+    .toUpperCase();
+}
+
+function pathValue(name, project, location) {
+  if (/^projects?(Id)?$/.test(name)) return project || 'PROJECT_ID';
+  if (/^locations?(Id)?$/.test(name)) return location || 'LOCATION';
+  return placeholderName(name);
+}
+
+function buildCurl(method, discovery, schemas) {
+  const project = settingValue('project');
+  const location = settingValue('location');
+  const sa = settingValue('sa');
+
+  const path = method.path.replace(/\{\+?([^}]+)\}/g, (_, name) => pathValue(name, project, location));
+  let url = `${discovery.rootUrl || ''}${discovery.servicePath || ''}${path}`;
+  const requiredQuery = method.parameters.filter((p) => p.location === 'query' && p.required);
+  if (requiredQuery.length) {
+    url += '?' + requiredQuery.map((p) => `${p.name}=${placeholderName(p.name)}`).join('&');
+  }
+
+  const token = sa
+    ? `$(gcloud auth print-access-token --impersonate-service-account=${sa})`
+    : '$(gcloud auth print-access-token)';
+  const lines = [`curl -X ${method.httpMethod} \\`, `  -H "Authorization: Bearer ${token}" \\`];
+  // A user token from gcloud is billed to gcloud's own client project unless told
+  // otherwise, which many APIs reject; an impersonated token already carries one.
+  if (project && !sa) lines.push(`  -H "x-goog-user-project: ${project}" \\`);
+  if (method.request) {
+    const skeleton = JSON.stringify(bodySkeleton(method.request, schemas, 0), null, 2).replace(/\n/g, '\n  ');
+    lines.push('  -H "Content-Type: application/json" \\');
+    lines.push(`  -d '${skeleton}' \\`);
+  }
+  lines.push(`  "${url}"`);
+  return lines.join('\n');
+}
+
+function bodySkeleton(ref, schemas, depth) {
+  const schema = schemas[ref];
+  if (!schema || depth > 2) return {};
+  const out = {};
+  for (const [prop, spec] of Object.entries(schema.properties || {})) {
+    if (spec.readOnly) continue;
+    if (spec.$ref) out[prop] = bodySkeleton(spec.$ref, schemas, depth + 1);
+    else if (spec.type === 'array') out[prop] = [];
+    else if (spec.type === 'boolean') out[prop] = false;
+    else if (spec.type === 'integer' || spec.type === 'number') out[prop] = 0;
+    else if (spec.type === 'object') out[prop] = {};
+    else out[prop] = '';
+  }
+  return out;
+}
+
+function refreshCurls() {
+  state.curls = state.curls.filter((entry) => entry.code.isConnected);
+  for (const entry of state.curls) {
+    entry.code.textContent = buildCurl(entry.method, entry.discovery, entry.schemas);
+  }
+}
+
+function copyText(text, button) {
+  const done = (label) => {
+    button.textContent = label;
+    setTimeout(() => { button.textContent = 'Copy'; }, 1500);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(() => done('Copied'), () => done('Copy failed'));
+  } else {
+    done('Select to copy');
+  }
+}
+
+function renderAnswerDetail(box, name, detail) {
+  const meta = detail && detail.permissions && detail.permissions[name];
+  if (meta) {
+    if (meta.title) box.appendChild(el('div', 'answer-title', meta.title));
+    if (meta.description) box.appendChild(el('div', 'detail', meta.description));
+    const facts = el('div', 'facts');
+    if (meta.stage) facts.appendChild(el('span', `stage-badge ${meta.stage.toLowerCase()}`, meta.stage));
+    if (meta.customRolesSupportLevel) {
+      facts.appendChild(el('span', 'fact',
+        `custom roles: ${meta.customRolesSupportLevel.toLowerCase().replace('_', ' ')}`));
+    }
+    if (meta.primaryPermission) facts.appendChild(el('span', 'fact', `primary permission: ${meta.primaryPermission}`));
+    if (facts.childElementCount) box.appendChild(facts);
+  }
+
+  // A method whose primary permission this is (instances.insert for
+  // compute.instances.create) matters more than one that merely also needs it.
+  const methods = ((detail && detail.methods) || [])
+    .filter((m) => m.permissions.includes(name))
+    .sort((a, b) => Number(b.permissions[0] === name) - Number(a.permissions[0] === name));
+  if (methods.length) {
+    box.appendChild(el('h5', null, `Required by ${methods.length} API method${methods.length === 1 ? '' : 's'}`));
+    const list = el('div', 'methods');
+    methods.forEach((m) => list.appendChild(renderMethod(m, detail, name)));
+    box.appendChild(list);
+  } else if (detail && detail.discovery) {
+    const service = detail.service;
+    const text = {
+      listed: 'No method in the published API could be matched to this permission.',
+      unlisted: 'No method in the unlisted API could be matched to this permission.',
+      restricted: `${service}.googleapis.com will not serve its Discovery document anonymously, so its methods are not visible.`,
+      not_found: `Nothing answers at ${service}.googleapis.com.`,
+      error: 'The API document could not be fetched during the last build.',
+    }[detail.discovery.status];
+    if (text) box.appendChild(el('p', 'api-note', text));
+  }
 }
 
 boot();

@@ -195,3 +195,21 @@ def last_seen(history: History) -> dict[str, datetime.date]:
         for permission in change.added:
             gone.pop(permission, None)
     return gone
+
+
+def load_metadata(repo: Path, tracked_file: str) -> dict[str, dict] | None:
+    """Latest committed per-permission metadata, or None if the collector has none yet.
+
+    Read from HEAD rather than the working tree so it always describes the same
+    commit as the permissions.txt history it is displayed next to.
+    """
+    try:
+        blob = _git(repo, "show", f"HEAD:{tracked_file}")
+    except RuntimeError:
+        return None
+    records = {}
+    for line in blob.splitlines():
+        if line.strip():
+            record = json.loads(line)
+            records[record["name"]] = record
+    return records
