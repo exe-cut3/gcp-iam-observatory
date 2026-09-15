@@ -63,6 +63,33 @@ either, `docker compose restart` is enough — no rebuild.
 To build without touching the network, set `INDEXER_ARGS: "--no-enrich"`. The index
 still builds; cards just lose their role context.
 
+## For AI agents (MCP)
+
+The same index is served to AI agents as a read-only MCP server, so an agent can learn
+how Google Cloud access fits together and look up any endpoint before it touches your
+projects. `docker compose up` starts it next to the dashboard at
+`http://localhost:8081/mcp`. To add it to Claude Code:
+
+```bash
+claude mcp add --transport http gcp-iam http://localhost:8081/mcp
+```
+
+| Tool | Answers |
+|---|---|
+| `catalog_overview` | What the catalog holds, how fresh it is, Google's release rhythm |
+| `search` | Task wording to method ids, permissions, roles or services |
+| `get_service` | A service's API status, resources, roles and recent changes |
+| `get_method` | One endpoint: URL, parameters, body and response fields, required permissions with the narrowest roles that grant them, raw HTTP and curl |
+| `get_schema` | Deeper request and response types |
+| `get_permission` | When a permission appeared, which methods need it, which roles grant it |
+| `get_role` | A role's permissions, by service |
+| `whats_new` | Recent catalog changes by novelty tier |
+
+The server holds no credentials and never calls Google. To change infrastructure an agent
+uses its own tools (gcloud, or the request templates) with your credentials, so each
+change goes through your approval. It listens on loopback only and rejects requests
+whose Host header is not local.
+
 ## What the indexer writes
 
 | File | Contents |
@@ -73,6 +100,8 @@ still builds; cards just lose their role context.
 | `cadence.json` | Weekday and monthly statistics |
 | `apis.json` | Discovery status per explored service |
 | `detail/<service>.json` | Metadata, methods and schemas for one service, loaded on demand |
+| `roles.json` | Every predefined role with its permissions, for least-privilege lookups |
+| `methods.json` | Every API method in one compact table, for search |
 | `meta.json` | Coverage, collection gaps, excluded snapshots |
 
 ## Honesty about the data
@@ -95,6 +124,13 @@ rather than papering over it:
   is treated as a collection failure. This has happened once for real, when the list
   was briefly replaced by a two-line test fixture.
 
+- **The catalog is project-scoped.** It lists what Google reports as testable on a
+  project, so organization- and folder-level permissions are mostly absent. On 2026-01-30
+  five organization-level services (accesscontextmanager, assuredworkloads,
+  cloudcontrolspartner, policyremediatormanager, riskmanager) dropped out at once. They
+  still exist; the feed shows them as removed only because they stopped being testable on
+  a project. The MCP server still answers role questions for such permissions from the
+  upstream role data.
 - **API status is what an anonymous caller sees.** A 403 means the service's host
   exists but will not hand its Discovery document to a caller without an API key; on
   its own that does not prove the API is private. "No API host" means nothing answers at

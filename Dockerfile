@@ -10,8 +10,12 @@ RUN git config --global --add safe.directory '*'
 
 WORKDIR /app
 
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
 COPY indexer/ ./indexer/
 COPY web/ ./web/
+COPY mcp_server/ ./mcp_server/
 COPY entrypoint.sh ./
 RUN chmod +x entrypoint.sh
 
@@ -20,5 +24,5 @@ ENV COLLECTOR_REPO=/data/collector \
     CACHE_DIR=/app/.cache \
     PORT=8080
 
-EXPOSE 8080
+EXPOSE 8080 8081
 ENTRYPOINT ["./entrypoint.sh"]

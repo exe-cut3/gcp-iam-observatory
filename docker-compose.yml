@@ -11,13 +11,32 @@ services:
       - ../gcp-permissions-checker:/data/collector:ro
       # Persist the diff log and the iam-dataset download so a restart is fast.
       - observatory-cache:/app/.cache
+      # The built index, shared with the MCP server so both answer from the same data.
+      - observatory-dist:/app/dist
       # Mounted so code edits need only `docker compose restart`, not a rebuild.
       - ./web:/app/web:ro
       - ./indexer:/app/indexer:ro
+      - ./mcp_server:/app/mcp_server:ro
       - ./tests:/app/tests:ro
     environment:
       # Add --no-enrich here to build without fetching role data from the network.
       INDEXER_ARGS: ""
 
+  mcp:
+    build: .
+    image: gcp-iam-observatory
+    container_name: gcp-iam-mcp
+    depends_on:
+      - observatory
+    entrypoint: ["python", "-m", "mcp_server", "--dist", "/app/dist", "--host", "0.0.0.0", "--port", "8081"]
+    ports:
+      # Loopback only. The catalog holds no secrets, but nothing off this machine
+      # needs to reach it.
+      - "127.0.0.1:8081:8081"
+    volumes:
+      - observatory-dist:/app/dist:ro
+      - ./mcp_server:/app/mcp_server:ro
+
 volumes:
   observatory-cache:
+  observatory-dist:
