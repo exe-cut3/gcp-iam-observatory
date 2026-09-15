@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GCP IAM Observatory</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="mark" aria-hidden="true">◈</span>
+    <h1>GCP IAM Observatory</h1>
+  </div>
+  <p class="tagline">New IAM permissions as an early signal for unreleased Google Cloud functionality.</p>
+  <nav class="tabs" role="tablist" aria-label="Views">
+    <button role="tab" id="tab-feed" aria-controls="panel-feed" aria-selected="true" class="tab">Feed</button>
+    <button role="tab" id="tab-lookup" aria-controls="panel-lookup" aria-selected="false" class="tab">Lookup</button>
+    <button role="tab" id="tab-cadence" aria-controls="panel-cadence" aria-selected="false" class="tab">Cadence</button>
+  </nav>
+</header>
+
+<main>
+  <div id="loading" class="notice" role="status">Loading index…</div>
+  <div id="error" class="notice error" hidden role="alert"></div>
+
+  <!-- FEED -->
+  <section id="panel-feed" role="tabpanel" aria-labelledby="tab-feed" hidden>
+    <div class="statbar" id="feed-stats"></div>
+
+    <div class="controls">
+      <div class="control-group" role="group" aria-label="Novelty tier">
+        <button class="chip tier0 on" data-tier="0" aria-pressed="true">
+          New services <span class="chip-count" data-count="0">0</span>
+        </button>
+        <button class="chip tier1 on" data-tier="1" aria-pressed="true">
+          New resources <span class="chip-count" data-count="1">0</span>
+        </button>
+        <button class="chip tier2" data-tier="2" aria-pressed="false">
+          New capabilities <span class="chip-count" data-count="2">0</span>
+        </button>
+      </div>
+
+      <div class="control-group" role="group" aria-label="Time range">
+        <button class="range" data-days="30" aria-pressed="true">30d</button>
+        <button class="range" data-days="90" aria-pressed="false">90d</button>
+        <button class="range" data-days="365" aria-pressed="false">1y</button>
+        <button class="range" data-days="0" aria-pressed="false">All</button>
+      </div>
+
+      <div class="control-group grow">
+        <label class="sr-only" for="feed-filter">Filter by service or permission</label>
+        <input id="feed-filter" type="search" placeholder="Filter by service or permission…" autocomplete="off">
+        <label class="toggle">
+          <input type="checkbox" id="show-removed"> show removals
+        </label>
+      </div>
+    </div>
+
+    <p id="feed-summary" class="summary" role="status"></p>
+    <div id="feed"></div>
+    <p id="feed-empty" class="empty" hidden>No events match these filters.</p>
+  </section>
+
+  <!-- LOOKUP -->
+  <section id="panel-lookup" role="tabpanel" aria-labelledby="tab-lookup" hidden>
+    <div class="lookup-head">
+      <label class="sr-only" for="lookup-input">Permission or service</label>
+      <input id="lookup-input" type="search" placeholder="e.g. compute.instances.osLogin, or just aiplatform" autocomplete="off" spellcheck="false">
+      <p class="hint">Ask when a permission first appeared, or type a service to see everything it has ever exposed.</p>
+    </div>
+    <div id="lookup-status" class="notice subtle" hidden></div>
+    <div id="lookup-results"></div>
+  </section>
+
+  <!-- CADENCE -->
+  <section id="panel-cadence" role="tabpanel" aria-labelledby="tab-cadence" hidden>
+    <div id="cadence-headline" class="headline"></div>
+    <h2>New permissions by weekday</h2>
+    <p class="hint" id="cadence-caveat"></p>
+    <div id="weekday-chart" class="chart"></div>
+    <h2>Volume by month</h2>
+    <div id="monthly-chart" class="chart"></div>
+    <h2>Record coverage</h2>
+    <div id="coverage"></div>
+  </section>
+</main>
+
+<footer>
+  <span id="footer-meta"></span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

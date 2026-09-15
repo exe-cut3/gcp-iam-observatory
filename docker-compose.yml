@@ -1,0 +1,22 @@
+services:
+  observatory:
+    build: .
+    image: gcp-iam-observatory
+    container_name: gcp-iam-observatory
+    ports:
+      - "8080:8080"
+    volumes:
+      # The collector's git history is the data source. Read-only: the indexer
+      # must never be able to write to the archive it is reading.
+      - ../gcp-permissions-checker:/data/collector:ro
+      # Persist the diff log and the iam-dataset download so a restart is fast.
+      - observatory-cache:/app/.cache
+      # Mounted so code edits need only `docker compose restart`, not a rebuild.
+      - ./web:/app/web:ro
+      - ./indexer:/app/indexer:ro
+    environment:
+      # Add --no-enrich here to build without fetching role data from the network.
+      INDEXER_ARGS: ""
+
+volumes:
+  observatory-cache:
