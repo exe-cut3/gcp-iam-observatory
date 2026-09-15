@@ -10,7 +10,8 @@ const state = {
   apiDays: null,
   details: new Map(),
   settings: { project: '', location: '', sa: '' },
-  curls: [],
+  tryIts: [],
+  requestFormat: 'curl',
   tiers: new Set([0, 1]),
   days: 30,
   filter: '',
@@ -531,6 +532,7 @@ function bar(name, value, max, valueLabel, note, isPeak) {
 /* ---------------- permission metadata & API explorer ---------------- */
 
 const SETTINGS_KEY = 'observatory.tryit';
+const FORMAT_KEY = 'observatory.requestFormat';
 
 // Values are pasted into a shell command, so anything outside the real format is
 // ignored rather than interpolated.
@@ -553,6 +555,8 @@ function initSettings() {
     for (const key of Object.keys(state.settings)) {
       if (typeof saved[key] === 'string') state.settings[key] = saved[key];
     }
+    const format = localStorage.getItem(FORMAT_KEY);
+    if (format === 'curl' || format === 'http') state.requestFormat = format;
   } catch {
     // Storage unavailable (private window, blocked site data): settings just don't persist.
   }
@@ -570,7 +574,7 @@ function initSettings() {
       } catch {
         // Same as above: keep working without persistence.
       }
-      refreshCurls();
+      refreshRequests();
     });
   }
 }
@@ -763,7 +767,22 @@ function renderMethodBody(method, detail) {
     body.appendChild(renderSchema(method.response, schemas, 0));
   }
 
-  body.appendChild(el('h5', null, 'Try it'));
+  const tryHead = el('div', 'try-head');
+  tryHead.appendChild(el('h5', null, 'Try it'));
+  const toggle = el('div', 'format-toggle');
+  toggle.setAttribute('role', 'group');
+  toggle.setAttribute('aria-label', 'Request format');
+  const buttons = {};
+  for (const [format, label] of [['curl', 'curl'], ['http', 'raw HTTP']]) {
+    const button = el('button', 'format', label);
+    button.type = 'button';
+    button.addEventListener('click', () => setRequestFormat(format));
+    buttons[format] = button;
+    toggle.appendChild(button);
+  }
+  tryHead.appendChild(toggle);
+  body.appendChild(tryHead);
+
   const wrap = el('div', 'curl-wrap');
   const pre = el('pre', 'curl');
   const code = el('code');
@@ -774,12 +793,12 @@ function renderMethodBody(method, detail) {
   wrap.appendChild(copy);
   body.appendChild(wrap);
 
-  const entry = { code, method, discovery: detail.discovery, schemas };
-  state.curls.push(entry);
-  code.textContent = buildCurl(entry.method, entry.discovery, entry.schemas);
-  body.appendChild(el('p', 'hint',
-    'Fill project, location and service account under “Try-it settings” to replace the placeholders. ' +
-    'The command asks gcloud for a short-lived token; nothing on this page holds credentials.'));
+  const hint = el('p', 'hint');
+  body.appendChild(hint);
+
+  const entry = { code, hint, buttons, method, discovery: detail.discovery, schemas };
+  state.tryIts.push(entry);
+  renderTryIt(entry);
   return body;
 }
 
@@ -848,7 +867,7 @@ function pathValue(name, project, location) {
   return placeholderName(name);
 }
 
-function buildCurl(method, discovery, schemas) {
+function buildRequest(method, discovery, schemas) {
   const project = settingValue('project');
   const location = settingValue('location');
   const sa = settingValue('sa');
@@ -860,20 +879,56 @@ function buildCurl(method, discovery, schemas) {
     url += '?' + requiredQuery.map((p) => `${p.name}=${placeholderName(p.name)}`).join('&');
   }
 
-  const token = sa
-    ? `$(gcloud auth print-access-token --impersonate-service-account=${sa})`
-    : '$(gcloud auth print-access-token)';
-  const lines = [`curl -X ${method.httpMethod} \\`, `  -H "Authorization: Bearer ${token}" \\`];
+  const headers = [];
   // A user token from gcloud is billed to gcloud's own client project unless told
   // otherwise, which many APIs reject; an impersonated token already carries one.
-  if (project && !sa) lines.push(`  -H "x-goog-user-project: ${project}" \\`);
+  if (project && !sa) headers.push(['x-goog-user-project', project]);
+
+  let body = null;
   if (method.request) {
-    const skeleton = JSON.stringify(bodySkeleton(method.request, schemas, 0), null, 2).replace(/\n/g, '\n  ');
-    lines.push('  -H "Content-Type: application/json" \\');
-    lines.push(`  -d '${skeleton}' \\`);
+    body = JSON.stringify(bodySkeleton(method.request, schemas, 0), null, 2);
+    headers.push(['Content-Type', 'application/json']);
   }
-  lines.push(`  "${url}"`);
+
+  const tokenCommand = sa
+    ? `gcloud auth print-access-token --impersonate-service-account=${sa}`
+    : 'gcloud auth print-access-token';
+  return { httpMethod: method.httpMethod, url, headers, body, tokenCommand };
+}
+
+function formatCurl(req) {
+  const lines = [`curl -X ${req.httpMethod} \\`, `  -H "Authorization: Bearer $(${req.tokenCommand})" \\`];
+  for (const [name, value] of req.headers) lines.push(`  -H "${name}: ${value}" \\`);
+  if (req.body != null) lines.push(`  -d '${req.body.replace(/\n/g, '\n  ')}' \\`);
+  lines.push(`  "${req.url}"`);
   return lines.join('\n');
+}
+
+function formatRawHttp(req) {
+  const target = new URL(req.url);
+  const lines = [
+    `${req.httpMethod} ${target.pathname}${target.search} HTTP/1.1`,
+    `Host: ${target.host}`,
+    'Authorization: Bearer ACCESS_TOKEN',
+    ...req.headers.map(([name, value]) => `${name}: ${value}`),
+  ];
+  if (req.body != null) lines.push(`Content-Length: ${new TextEncoder().encode(req.body).length}`);
+  // HTTP/1.1 separates header lines with CRLF. Tools that replay a pasted raw
+  // request byte for byte (openssl s_client, some proxies) need it exact.
+  return `${lines.join('\r\n')}\r\n\r\n${req.body ?? ''}`;
+}
+
+function renderTryIt(entry) {
+  const req = buildRequest(entry.method, entry.discovery, entry.schemas);
+  const raw = state.requestFormat === 'http';
+  entry.code.textContent = raw ? formatRawHttp(req) : formatCurl(req);
+  entry.hint.textContent = raw
+    ? `Replace ACCESS_TOKEN with the output of: ${req.tokenCommand}`
+    : 'Fill project, location and service account under “Try-it settings” to replace the placeholders. ' +
+      'The command asks gcloud for a short-lived token; nothing on this page holds credentials.';
+  for (const [format, button] of Object.entries(entry.buttons)) {
+    button.setAttribute('aria-pressed', String(format === state.requestFormat));
+  }
 }
 
 function bodySkeleton(ref, schemas, depth) {
@@ -892,11 +947,19 @@ function bodySkeleton(ref, schemas, depth) {
   return out;
 }
 
-function refreshCurls() {
-  state.curls = state.curls.filter((entry) => entry.code.isConnected);
-  for (const entry of state.curls) {
-    entry.code.textContent = buildCurl(entry.method, entry.discovery, entry.schemas);
+function refreshRequests() {
+  state.tryIts = state.tryIts.filter((entry) => entry.code.isConnected);
+  state.tryIts.forEach(renderTryIt);
+}
+
+function setRequestFormat(format) {
+  state.requestFormat = format;
+  try {
+    localStorage.setItem(FORMAT_KEY, format);
+  } catch {
+    // Storage unavailable: the choice lasts for this page view only.
   }
+  refreshRequests();
 }
 
 function copyText(text, button) {

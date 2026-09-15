@@ -475,6 +475,17 @@ button.copy { position: absolute; top: 6px; right: 6px; }
 button.more { align-self: flex-start; margin-top: 4px; }
 button.copy:hover, button.more:hover { color: var(--text); border-color: var(--accent); }
 
+.try-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 12px 0 6px; }
+.try-head h5 { margin: 0; }
+.format-toggle { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 6px; overflow: hidden; }
+button.format {
+  appearance: none; border: 0; background: var(--bg-raised); color: var(--text-dim);
+  font: 12px var(--mono); padding: 3px 10px; cursor: pointer;
+}
+button.format + button.format { border-left: 1px solid var(--border-strong); }
+button.format:hover { color: var(--text); }
+button.format[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
