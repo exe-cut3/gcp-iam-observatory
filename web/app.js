@@ -590,9 +590,10 @@ function renderApiSection(section, event, detail) {
 
   const info = detail && detail.discovery;
   if (!info) {
-    section.appendChild(el('p', 'api-note', state.apiDays
-      ? `Not explored. API documents are fetched for services with additions in the last ${state.apiDays} days.`
-      : 'API exploration is turned off for this build.'));
+    let missing = 'API exploration is turned off for this build.';
+    if (state.apiDays === 0) missing = 'No API document was fetched: this service is no longer in the permission catalog.';
+    else if (state.apiDays) missing = `Not explored. API documents are fetched for services with additions in the last ${state.apiDays} days.`;
+    section.appendChild(el('p', 'api-note', missing));
     return;
   }
 
@@ -831,7 +832,7 @@ function buildRequest(method, discovery, schemas) {
   let url = `${discovery.rootUrl || ''}${discovery.servicePath || ''}${path}`;
   const requiredQuery = method.parameters.filter((p) => p.location === 'query' && p.required);
   if (requiredQuery.length) {
-    url += '?' + requiredQuery.map((p) => `${p.name}=${placeholderName(p.name)}`).join('&');
+    url += '?' + requiredQuery.map((p) => `${p.name}=${pathValue(p.name)}`).join('&');
   }
 
   const headers = [];

@@ -72,7 +72,8 @@ def _error_message(body: bytes) -> str:
 
 def _reason_kind(reason: str | None) -> str:
     text = (reason or "").lower()
-    return "identity" if "unregistered callers" in text or "api key" in text else "other"
+    identity_markers = ("unregistered callers", "api key", "authentication credential")
+    return "identity" if any(marker in text for marker in identity_markers) else "other"
 
 
 def load_directory(cache_dir: Path, refresh: bool = False) -> dict[str, list[dict]]:
@@ -155,6 +156,8 @@ def _resolve_uncached(service: str, directory: dict, aliases: dict) -> dict:
             tried.append({"version": entry["version"], "code": code})
             if code == 200:
                 return _document(LISTED, api, entry["version"], body, tried, entry)
+            if code in (401, 403):
+                return {"status": RESTRICTED, "api": api, "reason": _error_message(body), "tried": tried}
             if code != 404:
                 return {"status": ERROR, "api": api, "reason": _error_message(body), "tried": tried}
 
@@ -164,9 +167,9 @@ def _resolve_uncached(service: str, directory: dict, aliases: dict) -> dict:
         tried.append({"version": version, "code": code})
         if code == 200:
             return _document(LISTED if listing else UNLISTED, service, version, body, tried, listing)
-        if code == 403:
-            # The refusal comes from the service's own front end, so the host is
-            # real, and it is the same answer for every version.
+        if code in (401, 403):
+            # An authentication or permission refusal comes from the service's own
+            # front end, so the host is real, and it is the same for every version.
             return {"status": RESTRICTED, "api": service, "reason": _error_message(body), "tried": tried}
         if code != 404:
             return {"status": ERROR, "api": service, "reason": _error_message(body), "tried": tried}
@@ -324,6 +327,7 @@ def build_detail(service: str, resolved: dict, catalog: set[str], method_permiss
         "status": status,
         "api": discovery["api"],
         "version": discovery["version"],
+        "title": discovery["title"],
         "methods": len(methods),
         "mapped": sum(1 for m in methods if m["permissionSource"] == "mapped"),
         "inferred": sum(1 for m in methods if m["permissionSource"] == "inferred"),

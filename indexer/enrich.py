@@ -52,12 +52,19 @@ def load(cache_dir: Path, refresh: bool = False) -> dict:
     paths = fetch(cache_dir, refresh)
 
     roles_by_service: dict[str, list[dict]] = {}
+    role_info: dict[str, dict] = {}
     if "predefined_roles.json" in paths:
         roles = json.loads(paths["predefined_roles.json"].read_text(encoding="utf-8"))
         for role in roles:
             name = role.get("name", "")
             if not name.startswith("roles/"):
                 continue
+            role_info[name] = {
+                "title": role.get("title", ""),
+                "description": role.get("description", ""),
+                "stage": role.get("stage", ""),
+                "deleted": bool(role.get("deleted")),
+            }
             service = name.removeprefix("roles/").split(".")[0]
             roles_by_service.setdefault(service, []).append(
                 {
@@ -78,6 +85,7 @@ def load(cache_dir: Path, refresh: bool = False) -> dict:
 
     return {
         "rolesByService": roles_by_service,
+        "roles": role_info,
         "grantingRoles": granting_roles,
         "mapPath": paths.get("map.json"),
     }

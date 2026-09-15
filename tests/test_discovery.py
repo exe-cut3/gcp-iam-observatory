@@ -206,6 +206,17 @@ class BrokenDirectoryLinks(unittest.TestCase):
         self.assertEqual(result["status"], "not_found")
         self.assertTrue((self.cache / "integrations.json").exists())
 
+    def test_listed_document_behind_authentication_is_restricted_not_an_error(self):
+        directory = {"automl": [
+            {"version": "v1", "preferred": True, "discoveryRestUrl": "https://example.test/v1"},
+        ]}
+        body = json.dumps({"error": {
+            "code": 401, "message": "Request is missing required authentication credential."}}).encode()
+        with mock.patch.object(discovery, "_get", return_value=(401, body)):
+            result = discovery.resolve("automl", directory, {}, self.cache)
+        self.assertEqual(result["status"], "restricted")
+        self.assertEqual(discovery.build_detail("automl", result, set(), {})["discovery"]["reasonKind"], "identity")
+
 
 class LoadMetadata(unittest.TestCase):
     def git(self, *args):

@@ -16,6 +16,8 @@ import argparse
 import collections
 import datetime
 import json
+import os
+import re
 import sys
 from pathlib import Path
 
@@ -34,18 +36,53 @@ else:
     from . import history as history_mod
 
 
+def write_text_atomic(path: Path, text: str) -> None:
+    # The MCP server reads these files while a rebuild may be writing them, so
+    # each is replaced in one step rather than truncated and refilled.
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(text, encoding="utf-8")
+    os.replace(tmp, path)
+
+
 def write(path: Path, payload) -> None:
-    path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    write_text_atomic(path, json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
     print(f"  wrote {path.name}  ({path.stat().st_size / 1024:.0f} KB)")
+
+
+def build_roles(context: dict) -> dict:
+    """Role -> metadata and member permissions, inverted from the permission map."""
+    members: dict[str, list[str]] = {}
+    for permission, roles in context.get("grantingRoles", {}).items():
+        for role in roles:
+            members.setdefault(role, []).append(permission)
+    info = context.get("roles", {})
+    return {
+        role: {**info.get(role, {}), "permissions": sorted(members.get(role, []))}
+        for role in sorted(set(members) | set(info))
+    }
+
+
+def _first_sentence(text: str, limit: int = 200) -> str:
+    text = " ".join((text or "").split())
+    end = re.search(r"(?<=[.!?])\s", text)
+    return (text[: end.start()] if end else text)[:limit]
+
+
+def build_method_index(explored: dict) -> dict:
+    """Every method in one compact table for search; full detail stays in detail/."""
+    return {
+        "fields": ["id", "service", "httpMethod", "path", "summary", "permissions"],
+        "rows": [
+            [m["id"], service, m["httpMethod"], m["path"], _first_sentence(m["description"]), m["permissions"]]
+            for service, result in sorted(explored.items())
+            for m in result["methods"]
+        ],
+    }
 
 
 def write_details(directory: Path, metadata: dict, explored: dict) -> None:
     """One file per service, fetched by the browser only when a card is opened."""
     directory.mkdir(parents=True, exist_ok=True)
-    # The container's dist/ survives restarts, so a service that dropped out of
-    # scope would otherwise keep serving last build's file.
-    for stale in directory.glob("*.json"):
-        stale.unlink()
 
     by_service: dict[str, dict] = {}
     for name, record in metadata.items():
@@ -64,8 +101,16 @@ def write_details(directory: Path, metadata: dict, explored: dict) -> None:
             "permissions": by_service.get(service, {}),
         }
         path = directory / f"{service}.json"
-        path.write_text(json.dumps(payload, separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
+        write_text_atomic(path, json.dumps(payload, separators=(",", ":"), ensure_ascii=False))
         total += path.stat().st_size
+
+    # dist/ outlives the container, so a service that dropped out of scope would
+    # otherwise keep serving last build's file. Pruning after writing means a
+    # reader never finds a current service's file missing mid-build.
+    keep = {f"{service}.json" for service in services}
+    for stale in directory.glob("*.json"):
+        if stale.name not in keep:
+            stale.unlink()
     print(f"  wrote detail/ for {len(services)} services  ({total / 1024:.0f} KB total)")
 
 
@@ -85,8 +130,9 @@ def main() -> int:
                         help="Per-permission metadata file in the collector repo")
     parser.add_argument("--no-discovery", action="store_true",
                         help="Skip fetching Discovery documents for the API explorer")
-    parser.add_argument("--api-days", type=int, default=365,
-                        help="Explore APIs of services with additions in this many days (0 = all)")
+    parser.add_argument("--api-days", type=int, default=0,
+                        help="Explore APIs of services with additions in this many days; "
+                             "0 explores every service in the catalog")
     parser.add_argument("--refresh-discovery", action="store_true")
     args = parser.parse_args()
 
@@ -150,11 +196,11 @@ def main() -> int:
 
     explored: dict[str, dict] = {}
     if not args.no_discovery:
-        cutoff = datetime.date.today() - datetime.timedelta(days=args.api_days)
-        targets = sorted({
-            e.service for e in all_events
-            if e.change == "added" and (args.api_days == 0 or e.date >= cutoff)
-        })
+        if args.api_days == 0:
+            targets = sorted({permission.split(".")[0] for permission in hist.catalog})
+        else:
+            cutoff = datetime.date.today() - datetime.timedelta(days=args.api_days)
+            targets = sorted({e.service for e in all_events if e.change == "added" and e.date >= cutoff})
         print(f"exploring API docs for {len(targets)} services")
         explored = discovery_mod.explore(
             targets,
@@ -182,6 +228,8 @@ def main() -> int:
         "exploredDays": None if args.no_discovery else args.api_days,
         "services": {service: result["summary"] for service, result in explored.items()},
     })
+    write(args.output_dir / "roles.json", {"roles": build_roles(context)})
+    write(args.output_dir / "methods.json", build_method_index(explored))
     write(args.output_dir / "cadence.json",
           cadence_mod.build_cadence(hist, args.collection_hour_utc))
     write(args.output_dir / "meta.json", {
