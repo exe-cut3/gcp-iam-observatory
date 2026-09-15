@@ -28,12 +28,14 @@ if __package__ in (None, ""):
     from indexer import enrich as enrich_mod
     from indexer import events as events_mod
     from indexer import history as history_mod
+    from indexer import specs as specs_mod
 else:
     from . import cadence as cadence_mod
     from . import discovery as discovery_mod
     from . import enrich as enrich_mod
     from . import events as events_mod
     from . import history as history_mod
+    from . import specs as specs_mod
 
 
 def write_text_atomic(path: Path, text: str) -> None:
@@ -134,6 +136,8 @@ def main() -> int:
                         help="Explore APIs of services with additions in this many days; "
                              "0 explores every service in the catalog")
     parser.add_argument("--refresh-discovery", action="store_true")
+    parser.add_argument("--specs-dir", type=Path,
+                        help="Keep daily normalized API specs here and record changes between runs")
     args = parser.parse_args()
 
     if not (args.collector_repo / ".git").exists():
@@ -212,6 +216,12 @@ def main() -> int:
         counts = collections.Counter(r["summary"]["status"] for r in explored.values())
         print("  " + "  ".join(f"{status}={n}" for status, n in sorted(counts.items())))
 
+    api_changes: list[dict] = []
+    if args.specs_dir and explored:
+        todays = specs_mod.update_specs(args.specs_dir, explored, datetime.date.today())
+        api_changes = specs_mod.load_changes(args.specs_dir)
+        print(f"  recorded API specs; {len(todays)} change(s) since the last snapshot")
+
     print("writing index")
     write(args.output_dir / "events.json", {
         "generatedAt": datetime.datetime.now(tz=datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -230,6 +240,7 @@ def main() -> int:
     })
     write(args.output_dir / "roles.json", {"roles": build_roles(context)})
     write(args.output_dir / "methods.json", build_method_index(explored))
+    write(args.output_dir / "api_changes.json", {"events": api_changes})
     write(args.output_dir / "cadence.json",
           cadence_mod.build_cadence(hist, args.collection_hour_utc))
     write(args.output_dir / "meta.json", {
@@ -247,6 +258,7 @@ def main() -> int:
             "days": None if args.no_discovery else args.api_days,
             "byStatus": dict(collections.Counter(r["summary"]["status"] for r in explored.values())),
         },
+        "apiChanges": {"total": len(api_changes)},
     })
     print("done")
     return 0

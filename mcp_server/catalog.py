@@ -314,6 +314,7 @@ class Catalog:
         self.cadence = self._read("cadence.json")
         self.apis = self._read("apis.json", {"services": {}}).get("services", {})
         self.roles = self._read("roles.json", {"roles": {}}).get("roles", {})
+        self.api_changes = self._read("api_changes.json", {"events": []}).get("events", [])
         index = self._read("methods.json", {"fields": [], "rows": []})
         self.methods = [dict(zip(index["fields"], row)) for row in index["rows"]]
 
@@ -449,6 +450,13 @@ class Catalog:
         brief["grantedBy"] = self._granting_roles(name)
         return brief
 
+    @staticmethod
+    def _api_change(change: dict) -> dict:
+        compact = {k: v for k, v in change.items() if k != "methods"}
+        if "methods" in change:
+            compact["methods"] = change["methods"][:20]
+        return compact
+
     def _event(self, event: dict) -> dict:
         return {
             "date": event["date"],
@@ -488,6 +496,10 @@ class Catalog:
             },
             "permissionMetadata": self.meta.get("metadata"),
             "last30Days": self.meta.get("summary30"),
+            "apiChangesLast30Days": dict(Counter(
+                c["type"] for c in self.api_changes
+                if c["date"] >= (datetime.date.today() - datetime.timedelta(days=30)).isoformat()
+            )),
             "noveltyTiers": {str(tier): text for tier, text in TIER_DESCRIPTIONS.items()},
             "releaseCadence": {
                 "peakWeekday": self.cadence.get("peakDay"),
@@ -646,6 +658,7 @@ class Catalog:
             "resources": [{"resource": name, **counts} for name, counts in sorted(resources.items())],
             "roles": roles,
             "recentChanges": [self._event(e) for e in self.events if e["service"] == service][:10],
+            "recentApiChanges": [self._api_change(c) for c in self.api_changes if c["service"] == service][:10],
         }
 
     def get_method(self, method_id: str) -> dict:
@@ -798,10 +811,13 @@ class Catalog:
             and (not service or e["service"] == service)
         ]
         limit = _limit(limit, 50, 200)
+        api_changes = [c for c in self.api_changes if c["date"] >= since and (not service or c["service"] == service)]
         return {
             "since": since,
             "tiers": {str(t): TIER_DESCRIPTIONS[t] for t in sorted(wanted)},
             "total": len(matching),
             "events": [self._event(e) for e in matching[:limit]],
             "truncated": len(matching) > limit,
+            "apiChanges": [self._api_change(c) for c in api_changes[:limit]],
+            "apiChangesTotal": len(api_changes),
         }

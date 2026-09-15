@@ -1,0 +1,108 @@
+name: Daily catalog
+
+on:
+  schedule:
+    # Two hours after the collector (23:00 UTC), so today's permissions are in.
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-catalog
+  cancel-in-progress: false
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out observatory
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Check out collector history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: exe-cut3/gcp-permissions-checker
+          path: collector
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -t .
+
+      - name: Build index and record API specs
+        run: >
+          python -m indexer.build_index
+          --collector-repo collector
+          --output-dir dist
+          --cache-dir .cache
+          --specs-dir specs
+
+      - name: Commit specs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A specs
+          if git diff --staged --quiet; then
+            echo "Specs unchanged since an earlier run today."
+            exit 0
+          fi
+          changes=$(python -c "import json; print(json.load(open('specs/last_run.json'))['changes'])")
+          git commit -m "catalog: $(date -u +%F), ${changes} API change(s)"
+          git pull --rebase origin main
+          git push
+
+      - name: Publish index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -czf index.tar.gz -C dist --exclude='*.html' --exclude='*.js' --exclude='*.css' .
+          if ! gh release view index-latest >/dev/null 2>&1; then
+            gh release create index-latest --title "Latest catalog index" \
+              --notes "Rebuilt every day by the Daily catalog workflow. The Docker containers download this asset."
+          fi
+          gh release upload index-latest index.tar.gz --clobber
+
+      # Runs after publishing so a stalled collector still gets today's specs
+      # recorded, while the failure still raises an alert.
+      - name: Check the collector is still collecting
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          workflow=repos/exe-cut3/gcp-permissions-checker/actions/workflows/update-permissions.yml
+          state=$(gh api "$workflow" --jq .state)
+          last=$(gh api "$workflow/runs?status=success&per_page=1" --jq '.workflow_runs[0].created_at')
+          echo "Collector workflow is $state; last success $last"
+          if [ "$state" != "active" ]; then
+            echo "::error::The collector workflow is $state, so no new permissions are being recorded."
+            exit 1
+          fi
+          hours=$(( ( $(date +%s) - $(date -d "$last" +%s) ) / 3600 ))
+          if [ "$hours" -gt 50 ]; then
+            echo "::error::The collector last succeeded ${hours} hours ago."
+            exit 1
+          fi
+
+      - name: Notify failure via Telegram
+        if: failure()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+        run: |
+          if [ -z "$TELEGRAM_TOKEN" ]; then
+            echo "No Telegram secrets configured; GitHub's failure email still applies."
+            exit 0
+          fi
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_TO}" \
+            --data-urlencode "text=Daily catalog failed: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"

@@ -19,7 +19,11 @@ services:
       - ./mcp_server:/app/mcp_server:ro
       - ./tests:/app/tests:ro
     environment:
-      # Add --no-enrich here to build without fetching role data from the network.
+      # Download the index the daily GitHub workflow publishes. Set to "" to build
+      # locally from ../gcp-permissions-checker instead.
+      INDEX_URL: "https://github.com/exe-cut3/gcp-iam-observatory/releases/download/index-latest/index.tar.gz"
+      SYNC_INTERVAL_SECONDS: "21600"
+      # Build mode only: add --no-enrich to skip fetching role data from the network.
       INDEXER_ARGS: ""
 
   mcp:

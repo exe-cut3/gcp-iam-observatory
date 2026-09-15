@@ -51,6 +51,8 @@ role data for them, but no first-seen dates or API methods.
 callers (apiStatus "restricted") have no endpoints here.
 - Method-to-permission links marked "inferred" were matched by name; confirm them with testIamPermissions.
 - Role membership comes from the community iam-dataset and can lag behind brand-new permissions.
+- The index is rebuilt every day (indexBuiltAt in catalog_overview). API spec changes are found by comparing each \
+day's specs with the previous day's, so they are dated by the day they were first seen.
 """
 
 READ_ONLY = types.ToolAnnotations.model_validate(
@@ -133,7 +135,8 @@ def create_server(catalog: Catalog) -> MCPServer:
     ) -> dict:
         """Recent changes to the GCP IAM catalog, grouped into events. Tier 0 is a new service, 1 a new resource
         type on a known service, 2 new verbs on a known resource; the default is tiers 0 and 1. New permissions
-        usually appear before the feature they belong to is documented."""
+        usually appear before the feature they belong to is documented. apiChanges lists changes to API specs in
+        the same window: new or removed methods, new API versions, and specs that became public."""
         return answer(catalog.whats_new, days, tiers, service, include_removed, limit)
 
     return server

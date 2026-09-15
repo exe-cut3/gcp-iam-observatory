@@ -44,24 +44,38 @@ Opening a card adds two layers of detail, neither of which needs credentials:
   permission it needs, with a ready-to-copy `curl` that fetches its own token from
   `gcloud`, or the same request as raw HTTP for a proxy such as Caido or Burp.
 
-## Running it
+## How it stays current
 
-Everything runs in Docker. The only input is a local clone of the collector repo,
-mounted read-only.
+| When (UTC) | Where | What |
+|---|---|---|
+| 23:00 | gcp-permissions-checker workflow | Records every permission Google lists, with title and launch stage. On quiet days it commits a heartbeat so GitHub never disables the schedule. |
+| 01:00 | Daily catalog workflow (this repo) | Rebuilds the index from the collector's full history, fetches every service's API spec, commits the normalized specs to `specs/`, records what changed and publishes the index as the `index-latest` release. |
+| every 6 h | Your Docker containers | Download the latest published index; the MCP server reloads it. |
+
+`specs/` is the durable history of API definitions. `specs/apis/<service>.jsonl` holds
+each service's spec as last seen, and `specs/changes.jsonl` lists new and removed methods,
+new API versions and specs that became public, dated by the day they were first seen. A
+Discovery document can only be fetched as it is today, so this history cannot be
+recreated later.
+
+The workflow fails loudly (GitHub's failure email, plus Telegram when `TELEGRAM_TOKEN`
+and `TELEGRAM_TO` secrets are set) when the build breaks, or when the collector's
+workflow has stopped or not succeeded for two days.
+
+## Running it
 
 ```bash
 docker compose up --build
 ```
 
-Then open <http://localhost:8080>.
+Dashboard at <http://localhost:8080>, MCP server at `http://localhost:8081/mcp`.
 
-`docker-compose.yml` expects `../gcp-permissions-checker` next to this directory.
-The first run reads the whole history and fetches role data; later runs reuse a cached
-diff log and start in seconds. `indexer/` and `web/` are mounted, so after editing
-either, `docker compose restart` is enough — no rebuild.
-
-To build without touching the network, set `INDEXER_ARGS: "--no-enrich"`. The index
-still builds; cards just lose their role context.
+By default the containers download the published index, so nothing else is needed
+locally. To work on the indexer, set `INDEX_URL: ""` in `docker-compose.yml`: the
+container then builds from `../gcp-permissions-checker` next to this directory.
+`indexer/`, `web/` and `mcp_server/` are mounted, so `docker compose restart` picks up
+edits without a rebuild. In build mode, `INDEXER_ARGS: "--no-enrich"` skips fetching role
+data.
 
 ## For AI agents (MCP)
 
@@ -102,6 +116,7 @@ whose Host header is not local.
 | `detail/<service>.json` | Metadata, methods and schemas for one service, loaded on demand |
 | `roles.json` | Every predefined role with its permissions, for least-privilege lookups |
 | `methods.json` | Every API method in one compact table, for search |
+| `api_changes.json` | Every recorded API spec change, from `specs/changes.jsonl` |
 | `meta.json` | Coverage, collection gaps, excluded snapshots |
 
 ## Honesty about the data

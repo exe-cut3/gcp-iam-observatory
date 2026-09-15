@@ -125,6 +125,11 @@ def build_dist(root: Path) -> None:
         "schemas": {},
         "permissions": {"agentidentity.authProviders.create": {"title": "Create auth providers", "stage": "BETA"}},
     })
+    put("api_changes.json", {"events": [
+        {"date": days_ago(3), "service": "storage", "type": "new_methods", "count": 1,
+         "methods": ["storage.buckets.relocate"]},
+        {"date": days_ago(90), "service": "storage", "type": "version_change", "from": "v1beta", "to": "v1"},
+    ]})
     put("meta.json", {
         "generatedAt": "2026-09-15T00:00:00Z",
         "coverage": {"catalogSize": 4, "firstSnapshot": "2024-06-06", "lastSnapshot": "2026-09-10",
@@ -301,6 +306,12 @@ class WhatsNew(CatalogTest):
                          ["storage.objects"])
         with self.assertRaises(ValueError):
             self.catalog.whats_new(tiers=[5])
+
+    def test_api_spec_changes_come_with_permission_events(self):
+        news = self.catalog.whats_new(days=30)
+        self.assertEqual([(c["service"], c["type"]) for c in news["apiChanges"]], [("storage", "new_methods")])
+        self.assertEqual(self.catalog.get_service("storage")["recentApiChanges"][0]["methods"],
+                         ["storage.buckets.relocate"])
 
 
 if __name__ == "__main__":
