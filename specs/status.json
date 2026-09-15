@@ -1,0 +1,1587 @@
+{
+ "accessapproval": {
+  "api": "accessapproval",
+  "status": "listed",
+  "version": "v1"
+ },
+ "actions": {
+  "api": "actions",
+  "status": "restricted",
+  "version": null
+ },
+ "advisorynotifications": {
+  "api": "advisorynotifications",
+  "status": "listed",
+  "version": "v1"
+ },
+ "agentidentity": {
+  "api": "agentidentity",
+  "status": "listed",
+  "version": "v1"
+ },
+ "agentregistry": {
+  "api": "agentregistry",
+  "status": "listed",
+  "version": "v1"
+ },
+ "aiplatform": {
+  "api": "aiplatform",
+  "status": "listed",
+  "version": "v1"
+ },
+ "alloydb": {
+  "api": "alloydb",
+  "status": "listed",
+  "version": "v1"
+ },
+ "analyticshub": {
+  "api": "analyticshub",
+  "status": "listed",
+  "version": "v1"
+ },
+ "androidmanagement": {
+  "api": "androidmanagement",
+  "status": "listed",
+  "version": "v1"
+ },
+ "apigateway": {
+  "api": "apigateway",
+  "status": "listed",
+  "version": "v1"
+ },
+ "apigee": {
+  "api": "apigee",
+  "status": "listed",
+  "version": "v1"
+ },
+ "apigeeconnect": {
+  "api": "apigeeconnect",
+  "status": "restricted",
+  "version": null
+ },
+ "apigeeregistry": {
+  "api": "apigeeregistry",
+  "status": "error",
+  "version": null
+ },
+ "apihub": {
+  "api": "apihub",
+  "status": "listed",
+  "version": "v1"
+ },
+ "apikeys": {
+  "api": "apikeys",
+  "status": "listed",
+  "version": "v2"
+ },
+ "apim": {
+  "api": "apim",
+  "status": "listed",
+  "version": "v1alpha"
+ },
+ "appengine": {
+  "api": "appengine",
+  "status": "listed",
+  "version": "v1"
+ },
+ "apphub": {
+  "api": "apphub",
+  "status": "listed",
+  "version": "v1"
+ },
+ "applianceactivation": {
+  "api": "applianceactivation",
+  "status": "not_found",
+  "version": null
+ },
+ "appoptimize": {
+  "api": "appoptimize",
+  "status": "unlisted",
+  "version": "v1beta"
+ },
+ "apptopology": {
+  "api": "apptopology",
+  "status": "restricted",
+  "version": null
+ },
+ "artifactregistry": {
+  "api": "artifactregistry",
+  "status": "listed",
+  "version": "v1"
+ },
+ "assuredoss": {
+  "api": "assuredoss",
+  "status": "restricted",
+  "version": null
+ },
+ "auditmanager": {
+  "api": "auditmanager",
+  "status": "listed",
+  "version": "v1"
+ },
+ "automl": {
+  "api": "automl",
+  "status": "restricted",
+  "version": null
+ },
+ "automlrecommendations": {
+  "api": "automlrecommendations",
+  "status": "not_found",
+  "version": null
+ },
+ "autoscaling": {
+  "api": "autoscaling",
+  "status": "not_found",
+  "version": null
+ },
+ "axt": {
+  "api": "axt",
+  "status": "not_found",
+  "version": null
+ },
+ "backupdr": {
+  "api": "backupdr",
+  "status": "listed",
+  "version": "v1"
+ },
+ "baremetalsolution": {
+  "api": "baremetalsolution",
+  "status": "listed",
+  "version": "v2"
+ },
+ "batch": {
+  "api": "batch",
+  "status": "listed",
+  "version": "v1"
+ },
+ "beyondcorp": {
+  "api": "beyondcorp",
+  "status": "listed",
+  "version": "v1"
+ },
+ "biglake": {
+  "api": "biglake",
+  "status": "listed",
+  "version": "v1"
+ },
+ "bigquery": {
+  "api": "bigquery",
+  "status": "listed",
+  "version": "v2"
+ },
+ "bigquerymigration": {
+  "api": "bigquerymigration",
+  "status": "unlisted",
+  "version": "v2"
+ },
+ "bigqueryreservation": {
+  "api": "bigqueryreservation",
+  "status": "listed",
+  "version": "v1"
+ },
+ "bigtable": {
+  "api": "bigtableadmin",
+  "status": "listed",
+  "version": "v2"
+ },
+ "billing": {
+  "api": "billingbudgets",
+  "status": "listed",
+  "version": "v1"
+ },
+ "binaryauthorization": {
+  "api": "binaryauthorization",
+  "status": "listed",
+  "version": "v1"
+ },
+ "blockchainnodeengine": {
+  "api": "blockchainnodeengine",
+  "status": "listed",
+  "version": "v1"
+ },
+ "blockchainvalidatormanager": {
+  "api": "blockchainvalidatormanager",
+  "status": "restricted",
+  "version": null
+ },
+ "businessaicode": {
+  "api": "businessaicode",
+  "status": "restricted",
+  "version": null
+ },
+ "capacityplanner": {
+  "api": "capacityplanner",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "carestudio": {
+  "api": "carestudio",
+  "status": "not_found",
+  "version": null
+ },
+ "certificatemanager": {
+  "api": "certificatemanager",
+  "status": "listed",
+  "version": "v1"
+ },
+ "ces": {
+  "api": "ces",
+  "status": "listed",
+  "version": "v1"
+ },
+ "chat": {
+  "api": "chat",
+  "status": "listed",
+  "version": "v1"
+ },
+ "chronicle": {
+  "api": "chronicle",
+  "status": "not_found",
+  "version": null
+ },
+ "chroniclesm": {
+  "api": "chroniclesm",
+  "status": "not_found",
+  "version": null
+ },
+ "clientauthconfig": {
+  "api": "iap",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloud": {
+  "api": "cloud",
+  "status": "restricted",
+  "version": null
+ },
+ "cloudaicompanion": {
+  "api": "cloudaicompanion",
+  "status": "restricted",
+  "version": null
+ },
+ "cloudapiregistry": {
+  "api": "cloudapiregistry",
+  "status": "restricted",
+  "version": null
+ },
+ "cloudasset": {
+  "api": "cloudasset",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudbuild": {
+  "api": "cloudbuild",
+  "status": "listed",
+  "version": "v2"
+ },
+ "cloudconfig": {
+  "api": "cloudconfig",
+  "status": "not_found",
+  "version": null
+ },
+ "clouddebugger": {
+  "api": "clouddebugger",
+  "status": "not_found",
+  "version": null
+ },
+ "clouddeploy": {
+  "api": "clouddeploy",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudfunctions": {
+  "api": "cloudfunctions",
+  "status": "listed",
+  "version": "v2"
+ },
+ "cloudiottoken": {
+  "api": "cloudiottoken",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudjobdiscovery": {
+  "api": "cloudjobdiscovery",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudkms": {
+  "api": "cloudkms",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudlocationfinder": {
+  "api": "cloudlocationfinder",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudmessaging": {
+  "api": "fcm",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudmigration": {
+  "api": "cloudmigration",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudnotifications": {
+  "api": "cloudnotifications",
+  "status": "error",
+  "version": null
+ },
+ "cloudnumberregistry": {
+  "api": "cloudnumberregistry",
+  "status": "listed",
+  "version": "v1alpha"
+ },
+ "cloudonefs": {
+  "api": "cloudonefs",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudoptimization": {
+  "api": "cloudoptimization",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudprivatecatalog": {
+  "api": "cloudprivatecatalog",
+  "status": "restricted",
+  "version": null
+ },
+ "cloudprivatecatalogproducer": {
+  "api": "cloudprivatecatalogproducer",
+  "status": "restricted",
+  "version": null
+ },
+ "cloudprofiler": {
+  "api": "cloudprofiler",
+  "status": "listed",
+  "version": "v2"
+ },
+ "cloudquotas": {
+  "api": "cloudquotas",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "cloudscheduler": {
+  "api": "cloudscheduler",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudsecuritycompliance": {
+  "api": "cloudsecuritycompliance",
+  "status": "restricted",
+  "version": null
+ },
+ "cloudsecurityscanner": {
+  "api": "websecurityscanner",
+  "status": "listed",
+  "version": "v1"
+ },
+ "cloudsql": {
+  "api": "cloudsql",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudsupport": {
+  "api": "cloudsupport",
+  "status": "listed",
+  "version": "v2"
+ },
+ "cloudtasks": {
+  "api": "cloudtasks",
+  "status": "listed",
+  "version": "v2"
+ },
+ "cloudtestservice": {
+  "api": "cloudtestservice",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudtoolresults": {
+  "api": "toolresults",
+  "status": "listed",
+  "version": "v1beta3"
+ },
+ "cloudtrace": {
+  "api": "cloudtrace",
+  "status": "listed",
+  "version": "v2"
+ },
+ "cloudtranslate": {
+  "api": "cloudtranslate",
+  "status": "not_found",
+  "version": null
+ },
+ "cloudvolumesgcp-api": {
+  "api": "cloudvolumesgcp-api",
+  "status": "not_found",
+  "version": null
+ },
+ "commerceagreementpublishing": {
+  "api": "commerceagreementpublishing",
+  "status": "restricted",
+  "version": null
+ },
+ "commercebusinessenablement": {
+  "api": "commercebusinessenablement",
+  "status": "restricted",
+  "version": null
+ },
+ "commerceoffercatalog": {
+  "api": "commerceoffercatalog",
+  "status": "restricted",
+  "version": null
+ },
+ "commerceorggovernance": {
+  "api": "commerceorggovernance",
+  "status": "restricted",
+  "version": null
+ },
+ "commerceprice": {
+  "api": "commerceprice",
+  "status": "not_found",
+  "version": null
+ },
+ "commerceproducer": {
+  "api": "commerceproducer",
+  "status": "restricted",
+  "version": null
+ },
+ "composer": {
+  "api": "composer",
+  "status": "listed",
+  "version": "v1"
+ },
+ "compute": {
+  "api": "compute",
+  "status": "listed",
+  "version": "v1"
+ },
+ "confidentialcomputing": {
+  "api": "confidentialcomputing",
+  "status": "restricted",
+  "version": null
+ },
+ "config": {
+  "api": "config",
+  "status": "listed",
+  "version": "v1"
+ },
+ "configdelivery": {
+  "api": "configdelivery",
+  "status": "restricted",
+  "version": null
+ },
+ "connectors": {
+  "api": "connectors",
+  "status": "listed",
+  "version": "v2"
+ },
+ "consumerprocurement": {
+  "api": "consumerprocurement",
+  "status": "not_found",
+  "version": null
+ },
+ "contactcenteraiplatform": {
+  "api": "contactcenteraiplatform",
+  "status": "listed",
+  "version": "v1alpha1"
+ },
+ "contactcenterinsights": {
+  "api": "contactcenterinsights",
+  "status": "listed",
+  "version": "v1"
+ },
+ "container": {
+  "api": "container",
+  "status": "listed",
+  "version": "v1"
+ },
+ "containeranalysis": {
+  "api": "containeranalysis",
+  "status": "listed",
+  "version": "v1"
+ },
+ "containersecurity": {
+  "api": "containersecurity",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "contentwarehouse": {
+  "api": "contentwarehouse",
+  "status": "listed",
+  "version": "v1"
+ },
+ "databasecenter": {
+  "api": "databasecenter",
+  "status": "listed",
+  "version": "v1beta"
+ },
+ "databaseinsights": {
+  "api": "databaseinsights",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "databasesconsole": {
+  "api": "databasesconsole",
+  "status": "restricted",
+  "version": null
+ },
+ "datacatalog": {
+  "api": "datacatalog",
+  "status": "listed",
+  "version": "v1"
+ },
+ "dataconnectors": {
+  "api": "dataconnectors",
+  "status": "restricted",
+  "version": null
+ },
+ "dataflow": {
+  "api": "dataflow",
+  "status": "listed",
+  "version": "v1b3"
+ },
+ "dataform": {
+  "api": "dataform",
+  "status": "listed",
+  "version": "v1"
+ },
+ "datafusion": {
+  "api": "datafusion",
+  "status": "listed",
+  "version": "v1"
+ },
+ "datalabeling": {
+  "api": "datalabeling",
+  "status": "error",
+  "version": null
+ },
+ "datalineage": {
+  "api": "datalineage",
+  "status": "listed",
+  "version": "v1"
+ },
+ "datamigration": {
+  "api": "datamigration",
+  "status": "listed",
+  "version": "v1"
+ },
+ "datapipelines": {
+  "api": "datapipelines",
+  "status": "listed",
+  "version": "v1"
+ },
+ "dataplex": {
+  "api": "dataplex",
+  "status": "listed",
+  "version": "v1"
+ },
+ "dataprep": {
+  "api": "dataprep",
+  "status": "not_found",
+  "version": null
+ },
+ "dataproc": {
+  "api": "dataproc",
+  "status": "listed",
+  "version": "v1"
+ },
+ "dataprocessing": {
+  "api": "dataprocessing",
+  "status": "not_found",
+  "version": null
+ },
+ "dataprocrm": {
+  "api": "dataprocrm",
+  "status": "restricted",
+  "version": null
+ },
+ "datastore": {
+  "api": "datastore",
+  "status": "listed",
+  "version": "v1"
+ },
+ "datastream": {
+  "api": "datastream",
+  "status": "listed",
+  "version": "v1"
+ },
+ "datastudio": {
+  "api": "datastudio",
+  "status": "restricted",
+  "version": null
+ },
+ "deploymentmanager": {
+  "api": "deploymentmanager",
+  "status": "listed",
+  "version": "v2"
+ },
+ "designcenter": {
+  "api": "designcenter",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "developerconnect": {
+  "api": "developerconnect",
+  "status": "listed",
+  "version": "v1"
+ },
+ "devicerun": {
+  "api": "devicerun",
+  "status": "restricted",
+  "version": null
+ },
+ "devicestreaming": {
+  "api": "devicestreaming",
+  "status": "restricted",
+  "version": null
+ },
+ "dialogflow": {
+  "api": "dialogflow",
+  "status": "listed",
+  "version": "v3"
+ },
+ "discoveryengine": {
+  "api": "discoveryengine",
+  "status": "listed",
+  "version": "v1"
+ },
+ "dlp": {
+  "api": "dlp",
+  "status": "listed",
+  "version": "v2"
+ },
+ "dns": {
+  "api": "dns",
+  "status": "listed",
+  "version": "v1"
+ },
+ "documentai": {
+  "api": "documentai",
+  "status": "listed",
+  "version": "v1"
+ },
+ "domains": {
+  "api": "domains",
+  "status": "listed",
+  "version": "v1"
+ },
+ "dspm": {
+  "api": "dspm",
+  "status": "restricted",
+  "version": null
+ },
+ "earth": {
+  "api": "earth",
+  "status": "not_found",
+  "version": null
+ },
+ "earthengine": {
+  "api": "earthengine",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "edgecontainer": {
+  "api": "edgecontainer",
+  "status": "restricted",
+  "version": null
+ },
+ "edgenetwork": {
+  "api": "edgenetwork",
+  "status": "restricted",
+  "version": null
+ },
+ "enterpriseknowledgegraph": {
+  "api": "enterpriseknowledgegraph",
+  "status": "restricted",
+  "version": null
+ },
+ "enterprisepurchasing": {
+  "api": "enterprisepurchasing",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "errorreporting": {
+  "api": "clouderrorreporting",
+  "status": "listed",
+  "version": "v1beta1"
+ },
+ "essentialcontacts": {
+  "api": "essentialcontacts",
+  "status": "listed",
+  "version": "v1"
+ },
+ "eventarc": {
+  "api": "eventarc",
+  "status": "listed",
+  "version": "v1"
+ },
+ "externalexposure": {
+  "api": "externalexposure",
+  "status": "restricted",
+  "version": null
+ },
+ "faulttesting": {
+  "api": "faulttesting",
+  "status": "restricted",
+  "version": null
+ },
+ "fcmdata": {
+  "api": "fcmdata",
+  "status": "listed",
+  "version": "v1beta1"
+ },
+ "file": {
+  "api": "file",
+  "status": "listed",
+  "version": "v1"
+ },
+ "financialservices": {
+  "api": "financialservices",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "firebase": {
+  "api": "firebase",
+  "status": "listed",
+  "version": "v1beta1"
+ },
+ "firebaseabt": {
+  "api": "firebaseabt",
+  "status": "not_found",
+  "version": null
+ },
+ "firebaseanalytics": {
+  "api": "firebaseanalytics",
+  "status": "error",
+  "version": null
+ },
+ "firebaseappcheck": {
+  "api": "firebaseappcheck",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebaseappdistro": {
+  "api": "firebaseappdistro",
+  "status": "not_found",
+  "version": null
+ },
+ "firebaseapphosting": {
+  "api": "firebaseapphosting",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebaseauth": {
+  "api": "firebaseauth",
+  "status": "not_found",
+  "version": null
+ },
+ "firebasecloudmessaging": {
+  "api": "firebasecloudmessaging",
+  "status": "not_found",
+  "version": null
+ },
+ "firebasecrash": {
+  "api": "firebasecrash",
+  "status": "not_found",
+  "version": null
+ },
+ "firebasecrashlytics": {
+  "api": "firebasecrashlytics",
+  "status": "listed",
+  "version": "v1alpha"
+ },
+ "firebasedatabase": {
+  "api": "firebasedatabase",
+  "status": "listed",
+  "version": "v1beta"
+ },
+ "firebasedataconnect": {
+  "api": "firebasedataconnect",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebasedynamiclinks": {
+  "api": "firebasedynamiclinks",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebaseextensions": {
+  "api": "firebaseextensions",
+  "status": "restricted",
+  "version": null
+ },
+ "firebaseextensionspublisher": {
+  "api": "firebaseextensionspublisher",
+  "status": "restricted",
+  "version": null
+ },
+ "firebasehosting": {
+  "api": "firebasehosting",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebaseinappmessaging": {
+  "api": "firebaseinappmessaging",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "firebasemessagingcampaigns": {
+  "api": "firebasemessagingcampaigns",
+  "status": "restricted",
+  "version": null
+ },
+ "firebaseml": {
+  "api": "firebaseml",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebasenotifications": {
+  "api": "firebasenotifications",
+  "status": "not_found",
+  "version": null
+ },
+ "firebaseperformance": {
+  "api": "firebaseperformance",
+  "status": "not_found",
+  "version": null
+ },
+ "firebaserules": {
+  "api": "firebaserules",
+  "status": "listed",
+  "version": "v1"
+ },
+ "firebasestorage": {
+  "api": "firebasestorage",
+  "status": "listed",
+  "version": "v1beta"
+ },
+ "firebasevertexai": {
+  "api": "firebasevertexai",
+  "status": "unlisted",
+  "version": "v1beta"
+ },
+ "fleetengine": {
+  "api": "fleetengine",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "fpnv": {
+  "api": "fpnv",
+  "status": "not_found",
+  "version": null
+ },
+ "ftp": {
+  "api": "ftp",
+  "status": "listed",
+  "version": "v1"
+ },
+ "gcp": {
+  "api": "gcp",
+  "status": "not_found",
+  "version": null
+ },
+ "gdchardwaremanagement": {
+  "api": "gdchardwaremanagement",
+  "status": "restricted",
+  "version": null
+ },
+ "geminicloudassist": {
+  "api": "geminicloudassist",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "geminidataanalytics": {
+  "api": "geminidataanalytics",
+  "status": "restricted",
+  "version": null
+ },
+ "genomics": {
+  "api": "genomics",
+  "status": "not_found",
+  "version": null
+ },
+ "gke": {
+  "api": "gke",
+  "status": "not_found",
+  "version": null
+ },
+ "gkebackup": {
+  "api": "gkebackup",
+  "status": "listed",
+  "version": "v1"
+ },
+ "gkehub": {
+  "api": "gkehub",
+  "status": "listed",
+  "version": "v2"
+ },
+ "gkemulticloud": {
+  "api": "gkemulticloud",
+  "status": "not_found",
+  "version": null
+ },
+ "gkeonprem": {
+  "api": "gkeonprem",
+  "status": "listed",
+  "version": "v1"
+ },
+ "gsuiteaddons": {
+  "api": "gsuiteaddons",
+  "status": "restricted",
+  "version": null
+ },
+ "health": {
+  "api": "health",
+  "status": "listed",
+  "version": "v4"
+ },
+ "healthcare": {
+  "api": "healthcare",
+  "status": "listed",
+  "version": "v1"
+ },
+ "hypercomputecluster": {
+  "api": "hypercomputecluster",
+  "status": "listed",
+  "version": "v1"
+ },
+ "iam": {
+  "api": "iam",
+  "status": "listed",
+  "version": "v2"
+ },
+ "iamconnectors": {
+  "api": "iamconnectors",
+  "status": "restricted",
+  "version": null
+ },
+ "iap": {
+  "api": "iap",
+  "status": "listed",
+  "version": "v1"
+ },
+ "identitytoolkit": {
+  "api": "identitytoolkit",
+  "status": "listed",
+  "version": "v3"
+ },
+ "ids": {
+  "api": "ids",
+  "status": "listed",
+  "version": "v1"
+ },
+ "integrations": {
+  "api": "integrations",
+  "status": "not_found",
+  "version": null
+ },
+ "issuerswitch": {
+  "api": "issuerswitch",
+  "status": "not_found",
+  "version": null
+ },
+ "krmapihosting": {
+  "api": "krmapihosting",
+  "status": "restricted",
+  "version": null
+ },
+ "kubernetesmetadata": {
+  "api": "kubernetesmetadata",
+  "status": "restricted",
+  "version": null
+ },
+ "licensemanager": {
+  "api": "licensemanager",
+  "status": "restricted",
+  "version": null
+ },
+ "lifesciences": {
+  "api": "lifesciences",
+  "status": "error",
+  "version": null
+ },
+ "livestream": {
+  "api": "livestream",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "logging": {
+  "api": "logging",
+  "status": "listed",
+  "version": "v2"
+ },
+ "looker": {
+  "api": "looker",
+  "status": "listed",
+  "version": "v1"
+ },
+ "lookerstudio": {
+  "api": "lookerstudio",
+  "status": "not_found",
+  "version": null
+ },
+ "lustre": {
+  "api": "lustre",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "maintenance": {
+  "api": "maintenance",
+  "status": "restricted",
+  "version": null
+ },
+ "managedflink": {
+  "api": "managedflink",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "managedidentities": {
+  "api": "managedidentities",
+  "status": "listed",
+  "version": "v1"
+ },
+ "managedkafka": {
+  "api": "managedkafka",
+  "status": "listed",
+  "version": "v1"
+ },
+ "mandiant": {
+  "api": "mandiant",
+  "status": "not_found",
+  "version": null
+ },
+ "mapsadmin": {
+  "api": "mapsadmin",
+  "status": "not_found",
+  "version": null
+ },
+ "mapsanalytics": {
+  "api": "mapsanalytics",
+  "status": "restricted",
+  "version": null
+ },
+ "mapsplatformdatasets": {
+  "api": "mapsplatformdatasets",
+  "status": "restricted",
+  "version": null
+ },
+ "marketplacesolutions": {
+  "api": "marketplacesolutions",
+  "status": "not_found",
+  "version": null
+ },
+ "mcp": {
+  "api": "mcp",
+  "status": "not_found",
+  "version": null
+ },
+ "memcache": {
+  "api": "memcache",
+  "status": "listed",
+  "version": "v1"
+ },
+ "memorystore": {
+  "api": "memorystore",
+  "status": "restricted",
+  "version": null
+ },
+ "meshconfig": {
+  "api": "meshconfig",
+  "status": "restricted",
+  "version": null
+ },
+ "metastore": {
+  "api": "metastore",
+  "status": "listed",
+  "version": "v1"
+ },
+ "migrationcenter": {
+  "api": "migrationcenter",
+  "status": "listed",
+  "version": "v1"
+ },
+ "ml": {
+  "api": "ml",
+  "status": "listed",
+  "version": "v1"
+ },
+ "modelarmor": {
+  "api": "modelarmor",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "monitoring": {
+  "api": "monitoring",
+  "status": "listed",
+  "version": "v3"
+ },
+ "navigationconnect": {
+  "api": "navigationconnect",
+  "status": "restricted",
+  "version": null
+ },
+ "nestconsole": {
+  "api": "nestconsole",
+  "status": "not_found",
+  "version": null
+ },
+ "netapp": {
+  "api": "netapp",
+  "status": "listed",
+  "version": "v1"
+ },
+ "networkconnectivity": {
+  "api": "networkconnectivity",
+  "status": "listed",
+  "version": "v1"
+ },
+ "networkmanagement": {
+  "api": "networkmanagement",
+  "status": "listed",
+  "version": "v1"
+ },
+ "networksecurity": {
+  "api": "networksecurity",
+  "status": "listed",
+  "version": "v1"
+ },
+ "networkservices": {
+  "api": "networkservices",
+  "status": "listed",
+  "version": "v1"
+ },
+ "notebooks": {
+  "api": "notebooks",
+  "status": "listed",
+  "version": "v2"
+ },
+ "oauthconfig": {
+  "api": "oauthconfig",
+  "status": "restricted",
+  "version": null
+ },
+ "oauthpolicymetadata": {
+  "api": "oauthpolicymetadata",
+  "status": "not_found",
+  "version": null
+ },
+ "oauthtestapp": {
+  "api": "oauthtestapp",
+  "status": "not_found",
+  "version": null
+ },
+ "observability": {
+  "api": "observability",
+  "status": "listed",
+  "version": "v1"
+ },
+ "ondemandscanning": {
+  "api": "ondemandscanning",
+  "status": "listed",
+  "version": "v1"
+ },
+ "opsconfigmonitoring": {
+  "api": "opsconfigmonitoring",
+  "status": "restricted",
+  "version": null
+ },
+ "oracledatabase": {
+  "api": "oracledatabase",
+  "status": "listed",
+  "version": "v1"
+ },
+ "orgpolicy": {
+  "api": "orgpolicy",
+  "status": "listed",
+  "version": "v2"
+ },
+ "osconfig": {
+  "api": "osconfig",
+  "status": "listed",
+  "version": "v2"
+ },
+ "parallelstore": {
+  "api": "parallelstore",
+  "status": "listed",
+  "version": "v1"
+ },
+ "parametermanager": {
+  "api": "parametermanager",
+  "status": "listed",
+  "version": "v1"
+ },
+ "paymentsresellersubscription": {
+  "api": "paymentsresellersubscription",
+  "status": "listed",
+  "version": "v1"
+ },
+ "policyanalyzer": {
+  "api": "policyanalyzer",
+  "status": "listed",
+  "version": "v1"
+ },
+ "policysimulator": {
+  "api": "policysimulator",
+  "status": "listed",
+  "version": "v1"
+ },
+ "privateca": {
+  "api": "privateca",
+  "status": "listed",
+  "version": "v1"
+ },
+ "privilegedaccessmanager": {
+  "api": "privilegedaccessmanager",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "proximitybeacon": {
+  "api": "proximitybeacon",
+  "status": "error",
+  "version": null
+ },
+ "publicca": {
+  "api": "publicca",
+  "status": "listed",
+  "version": "v1"
+ },
+ "pubsub": {
+  "api": "pubsub",
+  "status": "listed",
+  "version": "v1"
+ },
+ "pubsublite": {
+  "api": "pubsublite",
+  "status": "listed",
+  "version": "v1"
+ },
+ "readerrevenuesubscriptionlinking": {
+  "api": "readerrevenuesubscriptionlinking",
+  "status": "listed",
+  "version": "v1"
+ },
+ "recaptchaenterprise": {
+  "api": "recaptchaenterprise",
+  "status": "listed",
+  "version": "v1"
+ },
+ "recommender": {
+  "api": "recommender",
+  "status": "listed",
+  "version": "v1"
+ },
+ "redis": {
+  "api": "redis",
+  "status": "listed",
+  "version": "v1"
+ },
+ "remotebuildexecution": {
+  "api": "remotebuildexecution",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "resourcemanager": {
+  "api": "cloudresourcemanager",
+  "status": "listed",
+  "version": "v3"
+ },
+ "resourcesettings": {
+  "api": "resourcesettings",
+  "status": "not_found",
+  "version": null
+ },
+ "retail": {
+  "api": "retail",
+  "status": "listed",
+  "version": "v2"
+ },
+ "riscconfigurationservice": {
+  "api": "riscconfigurationservice",
+  "status": "not_found",
+  "version": null
+ },
+ "rma": {
+  "api": "rma",
+  "status": "not_found",
+  "version": null
+ },
+ "roads": {
+  "api": "roads",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "routeoptimization": {
+  "api": "routeoptimization",
+  "status": "restricted",
+  "version": null
+ },
+ "run": {
+  "api": "run",
+  "status": "listed",
+  "version": "v2"
+ },
+ "runapps": {
+  "api": "runapps",
+  "status": "not_found",
+  "version": null
+ },
+ "runtimeconfig": {
+  "api": "runtimeconfig",
+  "status": "listed",
+  "version": "v1"
+ },
+ "saasconfig": {
+  "api": "saasconfig",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "saasservicemgmt": {
+  "api": "saasservicemgmt",
+  "status": "listed",
+  "version": "v1"
+ },
+ "secretmanager": {
+  "api": "secretmanager",
+  "status": "listed",
+  "version": "v1"
+ },
+ "securedlandingzone": {
+  "api": "securedlandingzone",
+  "status": "error",
+  "version": null
+ },
+ "securesourcemanager": {
+  "api": "securesourcemanager",
+  "status": "listed",
+  "version": "v1"
+ },
+ "securitycenter": {
+  "api": "securitycenter",
+  "status": "listed",
+  "version": "v1"
+ },
+ "securitycentermanagement": {
+  "api": "securitycentermanagement",
+  "status": "restricted",
+  "version": null
+ },
+ "securityposture": {
+  "api": "securityposture",
+  "status": "listed",
+  "version": "v1"
+ },
+ "servicebroker": {
+  "api": "servicebroker",
+  "status": "not_found",
+  "version": null
+ },
+ "serviceconsumermanagement": {
+  "api": "serviceconsumermanagement",
+  "status": "listed",
+  "version": "v1"
+ },
+ "servicedirectory": {
+  "api": "servicedirectory",
+  "status": "listed",
+  "version": "v1"
+ },
+ "serviceextensions": {
+  "api": "serviceextensions",
+  "status": "not_found",
+  "version": null
+ },
+ "servicehealth": {
+  "api": "servicehealth",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "servicemanagement": {
+  "api": "servicemanagement",
+  "status": "listed",
+  "version": "v1"
+ },
+ "servicenetworking": {
+  "api": "servicenetworking",
+  "status": "listed",
+  "version": "v1"
+ },
+ "servicesecurityinsights": {
+  "api": "servicesecurityinsights",
+  "status": "error",
+  "version": null
+ },
+ "serviceusage": {
+  "api": "serviceusage",
+  "status": "listed",
+  "version": "v1"
+ },
+ "source": {
+  "api": "source",
+  "status": "not_found",
+  "version": null
+ },
+ "spanner": {
+  "api": "spanner",
+  "status": "listed",
+  "version": "v1"
+ },
+ "speakerid": {
+  "api": "speakerid",
+  "status": "not_found",
+  "version": null
+ },
+ "speech": {
+  "api": "speech",
+  "status": "listed",
+  "version": "v1"
+ },
+ "stackdriver": {
+  "api": "stackdriver",
+  "status": "error",
+  "version": null
+ },
+ "storage": {
+  "api": "storage",
+  "status": "listed",
+  "version": "v1"
+ },
+ "storagebatchoperations": {
+  "api": "storagebatchoperations",
+  "status": "listed",
+  "version": "v1"
+ },
+ "storageinsights": {
+  "api": "storageinsights",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "storagetransfer": {
+  "api": "storagetransfer",
+  "status": "listed",
+  "version": "v1"
+ },
+ "stream": {
+  "api": "stream",
+  "status": "restricted",
+  "version": null
+ },
+ "subscribewithgoogledeveloper": {
+  "api": "subscribewithgoogledeveloper",
+  "status": "not_found",
+  "version": null
+ },
+ "telcoautomation": {
+  "api": "telcoautomation",
+  "status": "restricted",
+  "version": null
+ },
+ "telemetry": {
+  "api": "telemetry",
+  "status": "restricted",
+  "version": null
+ },
+ "threatintelligence": {
+  "api": "threatintelligence",
+  "status": "listed",
+  "version": "v1beta"
+ },
+ "timeseriesinsights": {
+  "api": "timeseriesinsights",
+  "status": "not_found",
+  "version": null
+ },
+ "tpu": {
+  "api": "tpu",
+  "status": "listed",
+  "version": "v2"
+ },
+ "trafficdirector": {
+  "api": "trafficdirector",
+  "status": "listed",
+  "version": "v3"
+ },
+ "transcoder": {
+  "api": "transcoder",
+  "status": "listed",
+  "version": "v1"
+ },
+ "transferappliance": {
+  "api": "transferappliance",
+  "status": "restricted",
+  "version": null
+ },
+ "translationhub": {
+  "api": "translationhub",
+  "status": "error",
+  "version": null
+ },
+ "vectorsearch": {
+  "api": "vectorsearch",
+  "status": "unlisted",
+  "version": "v1"
+ },
+ "videostitcher": {
+  "api": "videostitcher",
+  "status": "restricted",
+  "version": null
+ },
+ "visionai": {
+  "api": "visionai",
+  "status": "restricted",
+  "version": null
+ },
+ "visualinspection": {
+  "api": "visualinspection",
+  "status": "error",
+  "version": null
+ },
+ "vmmigration": {
+  "api": "vmmigration",
+  "status": "listed",
+  "version": "v1"
+ },
+ "vmwareengine": {
+  "api": "vmwareengine",
+  "status": "listed",
+  "version": "v1"
+ },
+ "vpcaccess": {
+  "api": "vpcaccess",
+  "status": "listed",
+  "version": "v1"
+ },
+ "workflows": {
+  "api": "workflows",
+  "status": "listed",
+  "version": "v1"
+ },
+ "workloadcertificate": {
+  "api": "workloadcertificate",
+  "status": "restricted",
+  "version": null
+ },
+ "workloadidentity": {
+  "api": "workloadidentity",
+  "status": "restricted",
+  "version": null
+ },
+ "workloadmanager": {
+  "api": "workloadmanager",
+  "status": "listed",
+  "version": "v1"
+ },
+ "workspacemarketplace": {
+  "api": "workspacemarketplace",
+  "status": "not_found",
+  "version": null
+ },
+ "workstations": {
+  "api": "workstations",
+  "status": "listed",
+  "version": "v1"
+ }
+}
