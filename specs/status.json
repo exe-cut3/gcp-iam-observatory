@@ -121,7 +121,7 @@
  },
  "automl": {
   "api": "automl",
-  "status": "restricted",
+  "status": "not_found",
   "version": null
  },
  "automlrecommendations": {
@@ -556,7 +556,7 @@
  },
  "datalabeling": {
   "api": "datalabeling",
-  "status": "error",
+  "status": "not_found",
   "version": null
  },
  "datalineage": {
@@ -756,7 +756,7 @@
  },
  "firebaseanalytics": {
   "api": "firebaseanalytics",
-  "status": "error",
+  "status": "not_found",
   "version": null
  },
  "firebaseappcheck": {
@@ -1351,7 +1351,7 @@
  },
  "securedlandingzone": {
   "api": "securedlandingzone",
-  "status": "error",
+  "status": "not_found",
   "version": null
  },
  "securesourcemanager": {
@@ -1411,7 +1411,7 @@
  },
  "servicesecurityinsights": {
   "api": "servicesecurityinsights",
-  "status": "error",
+  "status": "not_found",
   "version": null
  },
  "serviceusage": {
@@ -1516,7 +1516,7 @@
  },
  "translationhub": {
   "api": "translationhub",
-  "status": "error",
+  "status": "not_found",
   "version": null
  },
  "vectorsearch": {
