@@ -1519,6 +1519,11 @@
   "status": "not_found",
   "version": null
  },
+ "universalledger": {
+  "api": "universalledger",
+  "status": "unlisted",
+  "version": "v1"
+ },
  "vectorsearch": {
   "api": "vectorsearch",
   "status": "unlisted",
