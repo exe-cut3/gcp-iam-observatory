@@ -896,8 +896,8 @@
  },
  "geminidataanalytics": {
   "api": "geminidataanalytics",
-  "status": "restricted",
-  "version": null
+  "status": "unlisted",
+  "version": "v1"
  },
  "genomics": {
   "api": "genomics",
