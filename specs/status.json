@@ -1571,8 +1571,8 @@
  },
  "workloadidentity": {
   "api": "workloadidentity",
-  "status": "restricted",
-  "version": null
+  "status": "unlisted",
+  "version": "v1"
  },
  "workloadmanager": {
   "api": "workloadmanager",
