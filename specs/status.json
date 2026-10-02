@@ -976,8 +976,8 @@
  },
  "integrations": {
   "api": "integrations",
-  "status": "not_found",
-  "version": null
+  "status": "listed",
+  "version": "v2"
  },
  "issuerswitch": {
   "api": "issuerswitch",
