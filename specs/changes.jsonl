@@ -53,3 +53,5 @@
 {"count":3,"date":"2026-10-09","methods":["biglake.projects.catalogs.namespaces.views.getIamPolicy","biglake.projects.catalogs.namespaces.views.setIamPolicy","biglake.projects.catalogs.namespaces.views.testIamPermissions"],"service":"biglake","type":"new_methods"}
 {"count":3,"date":"2026-10-10","methods":["biglake.projects.catalogs.namespaces.views.getIamPolicy","biglake.projects.catalogs.namespaces.views.setIamPolicy","biglake.projects.catalogs.namespaces.views.testIamPermissions"],"service":"biglake","type":"removed_methods"}
 {"date":"2026-10-10","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
+{"count":3,"date":"2026-10-12","methods":["biglake.projects.catalogs.namespaces.views.getIamPolicy","biglake.projects.catalogs.namespaces.views.setIamPolicy","biglake.projects.catalogs.namespaces.views.testIamPermissions"],"service":"biglake","type":"new_methods"}
+{"date":"2026-10-12","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
