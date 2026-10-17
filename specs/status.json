@@ -1031,8 +1031,8 @@
  },
  "maintenance": {
   "api": "maintenance",
-  "status": "restricted",
-  "version": null
+  "status": "unlisted",
+  "version": "v1"
  },
  "managedflink": {
   "api": "managedflink",
