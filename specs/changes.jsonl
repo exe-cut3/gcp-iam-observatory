@@ -67,3 +67,5 @@
 {"date":"2026-10-18","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
 {"count":3,"date":"2026-10-19","methods":["agentregistry.projects.locations.skills.getIamPolicy","agentregistry.projects.locations.skills.setIamPolicy","agentregistry.projects.locations.skills.testIamPermissions"],"service":"agentregistry","type":"new_methods"}
 {"date":"2026-10-19","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
+{"count":1,"date":"2026-10-20","methods":["chat.spaces.messages.replaceCards"],"service":"chat","type":"new_methods"}
+{"count":4,"date":"2026-10-20","methods":["contactcenterinsights.projects.locations.assistantSessions.create","contactcenterinsights.projects.locations.assistantSessions.get","contactcenterinsights.projects.locations.assistantSessions.list","contactcenterinsights.projects.locations.assistantSessions.streamChat"],"service":"contactcenterinsights","type":"removed_methods"}
