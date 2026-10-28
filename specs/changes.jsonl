@@ -80,3 +80,4 @@
 {"date":"2026-10-25","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
 {"date":"2026-10-27","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
 {"count":1,"date":"2026-10-27","methods":["vmwareengine.projects.locations.capacityAllocations.list"],"service":"vmwareengine","type":"new_methods"}
+{"date":"2026-10-28","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
