@@ -506,8 +506,8 @@
  },
  "containersecurity": {
   "api": "containersecurity",
-  "status": "unlisted",
-  "version": "v1"
+  "status": "restricted",
+  "version": null
  },
  "contentwarehouse": {
   "api": "contentwarehouse",
@@ -632,7 +632,7 @@
  "devicerun": {
   "api": "devicerun",
   "status": "listed",
-  "version": "v1alpha"
+  "version": "v1"
  },
  "devicestreaming": {
   "api": "devicestreaming",
