@@ -506,8 +506,8 @@
  },
  "containersecurity": {
   "api": "containersecurity",
-  "status": "unlisted",
-  "version": "v1"
+  "status": "restricted",
+  "version": null
  },
  "contentwarehouse": {
   "api": "contentwarehouse",

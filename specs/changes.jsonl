@@ -88,3 +88,4 @@
 {"date":"2026-10-29","from":"v1alpha","service":"devicerun","to":"v1","type":"version_change"}
 {"count":6,"date":"2026-10-29","methods":["devicerun.projects.locations.sessions.batchGet","devicerun.projects.locations.sessions.cancel","devicerun.projects.locations.sessions.create","devicerun.projects.locations.sessions.delete","devicerun.projects.locations.sessions.get","devicerun.projects.locations.sessions.list"],"service":"devicerun","type":"removed_methods"}
 {"date":"2026-10-30","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
+{"date":"2026-10-31","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
