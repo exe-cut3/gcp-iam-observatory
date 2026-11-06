@@ -1579,6 +1579,11 @@
   "status": "listed",
   "version": "v1"
  },
+ "workspacekeyaccess": {
+  "api": "workspacekeyaccess",
+  "status": "restricted",
+  "version": null
+ },
  "workspacemarketplace": {
   "api": "workspacemarketplace",
   "status": "not_found",
