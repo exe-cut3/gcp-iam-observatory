@@ -112,3 +112,6 @@
 {"count":3,"date":"2026-11-09","methods":["apihub.projects.locations.generatedSpecApis.generateSpec","apihub.projects.locations.generatedSpecApis.get","apihub.projects.locations.generatedSpecApis.list"],"service":"apihub","type":"new_methods"}
 {"date":"2026-11-09","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
 {"date":"2026-11-10","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
+{"count":1,"date":"2026-11-11","methods":["contactcenteraiplatform.projects.locations.contactCenters.phoneNumbers.list"],"service":"contactcenteraiplatform","type":"new_methods"}
+{"count":1,"date":"2026-11-11","methods":["dataform.projects.locations.repositories.workspaces.createLongRunning"],"service":"dataform","type":"new_methods"}
+{"count":1,"date":"2026-11-11","methods":["storage.anywhereCaches.pause"],"service":"storage","type":"removed_methods"}
