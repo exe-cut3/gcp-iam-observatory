@@ -1541,7 +1541,7 @@
  },
  "visualinspection": {
   "api": "visualinspection",
-  "status": "error",
+  "status": "not_found",
   "version": null
  },
  "vmmigration": {
