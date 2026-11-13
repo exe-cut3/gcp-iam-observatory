@@ -115,3 +115,4 @@
 {"count":1,"date":"2026-11-11","methods":["contactcenteraiplatform.projects.locations.contactCenters.phoneNumbers.list"],"service":"contactcenteraiplatform","type":"new_methods"}
 {"count":1,"date":"2026-11-11","methods":["dataform.projects.locations.repositories.workspaces.createLongRunning"],"service":"dataform","type":"new_methods"}
 {"count":1,"date":"2026-11-11","methods":["storage.anywhereCaches.pause"],"service":"storage","type":"removed_methods"}
+{"count":1,"date":"2026-11-13","methods":["oracledatabase.projects.locations.odbNetworks.odbDnsZones.patch"],"service":"oracledatabase","type":"new_methods"}
