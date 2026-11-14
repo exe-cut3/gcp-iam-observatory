@@ -506,8 +506,8 @@
  },
  "containersecurity": {
   "api": "containersecurity",
-  "status": "unlisted",
-  "version": "v1"
+  "status": "restricted",
+  "version": null
  },
  "contentwarehouse": {
   "api": "contentwarehouse",
@@ -858,6 +858,11 @@
   "api": "firebasestorage",
   "status": "listed",
   "version": "v1beta"
+ },
+ "firebasetelemetryadmin": {
+  "api": "firebasetelemetryadmin",
+  "status": "unlisted",
+  "version": "v1alpha"
  },
  "firebasevertexai": {
   "api": "firebasevertexai",
