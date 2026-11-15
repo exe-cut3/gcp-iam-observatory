@@ -89,6 +89,11 @@
   "status": "listed",
   "version": "v1"
  },
+ "apphubendpoint": {
+  "api": "apphubendpoint",
+  "status": "unlisted",
+  "version": "v1alpha"
+ },
  "applianceactivation": {
   "api": "applianceactivation",
   "status": "not_found",
@@ -506,8 +511,8 @@
  },
  "containersecurity": {
   "api": "containersecurity",
-  "status": "restricted",
-  "version": null
+  "status": "unlisted",
+  "version": "v1"
  },
  "contentwarehouse": {
   "api": "contentwarehouse",
