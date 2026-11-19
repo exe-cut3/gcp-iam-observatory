@@ -124,3 +124,6 @@
 {"count":1,"date":"2026-11-17","methods":["chat.users.spaces.threads.updateThreadReadState"],"service":"chat","type":"new_methods"}
 {"date":"2026-11-17","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
 {"date":"2026-11-18","from":"restricted","methodCount":2,"service":"containersecurity","to":"unlisted","type":"status_change","version":"v1"}
+{"count":2,"date":"2026-11-19","methods":["agentregistry.projects.locations.getSkillEncryptionSpec","agentregistry.projects.locations.updateSkillEncryptionSpec"],"service":"agentregistry","type":"new_methods"}
+{"date":"2026-11-19","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
+{"count":6,"date":"2026-11-19","methods":["observability.projects.locations.reports.create","observability.projects.locations.reports.delete","observability.projects.locations.reports.get","observability.projects.locations.reports.list","observability.projects.locations.reports.patch","observability.projects.locations.reports.send"],"service":"observability","type":"new_methods"}
