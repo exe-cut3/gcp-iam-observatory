@@ -127,3 +127,4 @@
 {"count":2,"date":"2026-11-19","methods":["agentregistry.projects.locations.getSkillEncryptionSpec","agentregistry.projects.locations.updateSkillEncryptionSpec"],"service":"agentregistry","type":"new_methods"}
 {"date":"2026-11-19","from":"unlisted","service":"containersecurity","to":"restricted","type":"status_change","version":null}
 {"count":6,"date":"2026-11-19","methods":["observability.projects.locations.reports.create","observability.projects.locations.reports.delete","observability.projects.locations.reports.get","observability.projects.locations.reports.list","observability.projects.locations.reports.patch","observability.projects.locations.reports.send"],"service":"observability","type":"new_methods"}
+{"count":2,"date":"2026-11-20","methods":["firebasevertexai.projects.locations.publishers.models.predict","firebasevertexai.projects.locations.templates.templatePredict"],"service":"firebasevertexai","type":"removed_methods"}
